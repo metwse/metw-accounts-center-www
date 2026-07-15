@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
+import TurnstileWidget from '../../components/turnstile';
+
 import type { Session } from '../../lib/metw';
 import type { AwaitOverlay } from '../../types';
 
-import styles from './styles.module.scss';
-import TurnstileWidget from '../../components/turnstile';
+import styles from './style.module.scss';
 
 
 export default function GatewayPage(
@@ -90,7 +91,7 @@ export default function GatewayPage(
           <span>username</span>
           <input name="data-username" placeholder="username" />
           <span>email</span>
-          <input name="data-email" placeholder="email" />
+          <input name="data-email" placeholder="email" type="email" />
           <span>password</span>
           <input name="data-password" type="password" placeholder="password" />
           <input type="submit" value="signup" />

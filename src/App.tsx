@@ -81,7 +81,8 @@ export default function App({ session }: { session: Session }) {
       <LoadingOverlay isActive={loadingOverlayActive} />
 
       { page === Page.EmailVerificationSession ?
-        <EmailVerificationSessionPage /> : null }
+        <EmailVerificationSessionPage
+          session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Session ?
         <SessionPage session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Gateway ?

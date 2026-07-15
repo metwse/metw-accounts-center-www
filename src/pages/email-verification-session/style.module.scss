@@ -1,0 +1,22 @@
+.main {
+  section { position: relative; }
+
+  form {
+    display: flex;
+    gap: 0.5em 1em;
+
+    input { min-width: 0; }
+
+    .captcha {
+      display: flex;
+      position: absolute; inset: 0;
+      justify-content: center; align-items: center;
+    }
+  }
+}
+
+@media (max-width: 24rem) {
+  .main form {
+    flex-direction: column;
+  }
+}
