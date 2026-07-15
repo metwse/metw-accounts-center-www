@@ -54,6 +54,6 @@ export type TokenRes = {
 export type AccountRes = {
   readonly username: string,
   readonly email?: string,
-  readonly secondary_emails: string[],
+  secondary_emails: string[],
   readonly username_aliasses: string[],
 }

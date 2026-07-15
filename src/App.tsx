@@ -5,16 +5,18 @@ import { Session } from './lib/metw';
 import EmailVerificationSessionPage from './pages/email-verification-session';
 import GatewayPage from './pages/gateway';
 import SessionPage from './pages/session';
+import AuthPage from './pages/auth';
 
 import { Page } from './pages';
 
 import Header from './components/header';
 import LoadingOverlay from './components/loading-overlay';
+import { getAuthToken } from './util';
 
 
 export default function App({ session }: { session: Session }) {
-  const [page, setPage] = useState<Page>(Page.Loading);
   const [loadingOverlayActive, setLoadingOverlayActive] = useState(false);
+  const [page, setPage] = useState<Page>(Page.Loading);
 
   const updateTitle = (title: string | null) => {
     document.title = title === null ?
@@ -72,7 +74,13 @@ export default function App({ session }: { session: Session }) {
     }
   }, [page, session]);
 
-  useEffect(() => { session.loadTokenFromLocalStorage(); }, [])
+  useEffect(() => {
+    if (getAuthToken() === undefined) {
+      session.loadTokenFromLocalStorage();
+    } else {
+      setPage(Page.Auth);
+    }
+  }, [])
 
   return (
     <div>
@@ -87,6 +95,8 @@ export default function App({ session }: { session: Session }) {
         <SessionPage session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Gateway ?
         <GatewayPage session={session} awaitOverlay={awaitOverlay} /> : null }
+      { page === Page.Auth ?
+        <AuthPage session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Loading ?
         <main>...</main> : null }
     </div>

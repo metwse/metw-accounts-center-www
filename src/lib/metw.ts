@@ -6,6 +6,12 @@ import type {
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 
+export function decodeToken(base64EncodedToken: string):
+  { id: string, scope: any }
+{
+    return JSON.parse(atob(base64EncodedToken.split('.')[1]));
+}
+
 /**
  * Event types / emitted struct
  * - login_emailverificationsession: { }
@@ -51,7 +57,7 @@ export class Session extends EventTarget {
 
     window.localStorage.setItem('token', newToken);
 
-    const decodedToken = JSON.parse(atob(newToken.split('.')[1]));
+    const decodedToken = decodeToken(newToken);
     this.accountId = decodedToken.id;
 
     if (decodedToken.scope == 'EmailVerificationSession') {
@@ -185,14 +191,22 @@ export class Session extends EventTarget {
   }
 
   /* AUTHORIZATION */
-  async authorize({ token }: TokenReq): Promise<ApiActionResult> {
-    return await this.#request(
+  async auth({ token }: TokenReq): Promise<ApiActionResult> {
+    const scope = Object.entries(decodeToken(token).scope);
+    const scopeName = scope[0][0];
+
+    const res = await this.#request(
       '/auth',
       {
         method: 'POST',
         body: { token }
       }
     );
+
+    if (scopeName === 'CompleteSignup')
+      this.#removeToken();
+
+    return res;
   }
 
   /* SESSION */
@@ -213,12 +227,15 @@ export class Session extends EventTarget {
     );
   }
 
-  async setPrimaryEmail({ email }: EmailReq): Promise<ApiActionResult> {
+  async setPrimaryEmail(
+    { email, captcha }: EmailAndCaptchaReq
+  ): Promise<ApiActionResult> {
     return await this.#request(
       '/me/emails/set-primary',
       {
         method: 'POST',
         body: { email },
+        query: { captcha }
       }
     );
   }

@@ -1,0 +1,16 @@
+@use '../../styles/theme.scss' as *;
+
+
+.main {
+  section {
+
+    pre {
+      padding: 1rem; margin: 0; max-width: 100%;
+      background-color: $bg2;
+      white-space: pre-wrap; overflow-wrap: break-word; word-break: break-all;
+      font-family: monospace;
+    }
+
+    button { max-width: fit-content; }
+  }
+}
