@@ -2,13 +2,21 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
 
+  section { position: relative; }
+
   form {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 0.5em 1em;
-  }
 
-  input { min-width: 0; }
+    input { min-width: 0; }
+
+    .captcha {
+      display: flex;
+      position: absolute; inset: 0;
+      justify-content: center; align-items: center;
+    }
+  }
 }
 
 @media (max-width: 40rem) {

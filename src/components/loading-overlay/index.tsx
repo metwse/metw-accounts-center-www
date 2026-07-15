@@ -1,7 +1,9 @@
 import styles from './style.module.scss';
 
 
-export default function LoadingOverlay({ isActive }: { isActive: boolean }) {
+export default function LoadingOverlay(
+  { isActive }: { isActive: boolean }
+) {
   return (
     <>
       {

@@ -119,10 +119,10 @@ export class Session extends EventTarget {
         method: 'POST',
         body: {
           username, email, client_password_hash: passwordHash,
-          s: {
-            encrypted_master_: [],
-            encrypted_private_: [],
-            identity_: []
+          keys: {
+            encrypted_master_key: [],
+            encrypted_private_key: [],
+            identity_key: []
           }
         },
         query: { captcha }
