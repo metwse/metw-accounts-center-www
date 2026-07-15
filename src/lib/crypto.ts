@@ -1,5 +1,12 @@
-export async function key_stretching_v1(
-  keyString, { salt = 'metw-accounts-center', iterations = 500_000 }
+/* As of jul2026, Uint8Array.prototype.toBase64 is not supported by TypeScript. */
+declare global {
+  interface Uint8Array {
+    toBase64: () => string
+  }
+}
+
+export async function keyStretchingV1(
+  keyString: string, { salt = 'metw-accounts-center', iterations = 500_000 }
 ) {
   const utf8KeyEncoder = new TextEncoder();
 

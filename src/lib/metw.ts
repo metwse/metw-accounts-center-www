@@ -1,4 +1,4 @@
-import { key_stretching_v1 } from './crypto';
+import { keyStretchingV1 } from './crypto';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 
@@ -9,6 +9,10 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
  * - logout: { }
  */
 export class Session extends EventTarget {
+  isLoggedIn: boolean
+  token: string
+  accountId: string
+
   constructor() {
     super();
 
@@ -16,11 +20,15 @@ export class Session extends EventTarget {
     this.isLoggedIn = false;
     this.token = '';
     this.accountId = '';
+  }
 
+  loadTokenFromLocalStorage() {
     const savedToken = window.localStorage.getItem('token');
 
     if (savedToken !== null)
       this.#updateToken(savedToken);
+    else
+      this.#removeToken();
   }
 
   #removeToken() {
@@ -33,7 +41,7 @@ export class Session extends EventTarget {
     );
   }
 
-  #updateToken(newToken) {
+  #updateToken(newToken: string) {
     this.isLoggedIn = true;
     this.token = newToken;
 
@@ -55,10 +63,14 @@ export class Session extends EventTarget {
     }
   }
 
-  async request_(path, { method = 'GET', body, query }) {
-    let encodedQuery = '';
-    let encodedBody;
-    const headers = {};
+  async request_(
+    path: string,
+    { method = 'GET', body, query }:
+      { method?: string, body?: object, query?: Record<string, string> }
+  ) {
+    let encodedQuery: string = '';
+    let encodedBody: string | undefined;
+    const headers: Record<string, string>  = {};
 
     if (query !== undefined) {
       encodedQuery = '?' + new URLSearchParams(query).toString();
@@ -88,8 +100,12 @@ export class Session extends EventTarget {
     return [ok, res];
   }
 
-  async signup({ username, email, password, captcha }) {
-    const passwordHash = await key_stretching_v1(password, {});
+  /* AUTHENTICATION */
+  async signup(
+    { username, email, password, captcha }:
+      { username: string, email: string, password: string, captcha: string }
+  ) {
+    const passwordHash = await keyStretchingV1(password, {});
 
     let [ok, res] = await this.request_(
       '/signup',
@@ -97,10 +113,10 @@ export class Session extends EventTarget {
         method: 'POST',
         body: {
           username, email, client_password_hash: passwordHash,
-          keys: {
-            encrypted_master_key: [],
-            encrypted_private_key: [],
-            identity_key: []
+          s: {
+            encrypted_master_: [],
+            encrypted_private_: [],
+            identity_: []
           }
         },
         query: { captcha }
@@ -113,7 +129,10 @@ export class Session extends EventTarget {
     return ok ? [true] : [ok, res];
   }
 
-  async login({ username, email, password }) {
+  async login(
+    { username, email, password }:
+      { username: string, email: string, password: string }
+  ) {
     let loginBy;
 
     if (username === undefined && email !== undefined) {
@@ -124,7 +143,7 @@ export class Session extends EventTarget {
       throw 'provide email XOR username to login';
     }
 
-    const passwordHash = await key_stretching_v1(password, {});
+    const passwordHash = await keyStretchingV1(password, {});
 
     let [ok, res] = await this.request_(
       '/login/' + loginBy,
@@ -143,7 +162,22 @@ export class Session extends EventTarget {
     return ok ? [true] : [ok, res];
   }
 
-  async retrySignup({ email, captcha }) {
+  async logout() {
+    const [ok, res] = await this.request_(
+      '/logout',
+      {
+        method: 'POST',
+        body: { token: this.token }
+      }
+    );
+
+    this.#removeToken();
+
+    return ok ? [true] : [ok, res];
+  }
+
+  /* EMAIL VERIFICATION SESSION */
+  async retrySignup({ email, captcha } : { email: string, captcha: string }) {
     const [ok, res] = await this.request_(
       '/signup/retry',
       {
@@ -156,16 +190,57 @@ export class Session extends EventTarget {
     return ok ? [true] : [ok, res];
   }
 
-  async logout() {
-    if (!this.isLoggedIn) {
-      return [false];
-    }
-
+  /* AUTHORIZATION */
+  async authorize({ token }: { token: string }) {
     const [ok, res] = await this.request_(
-      '/logout',
+      '/auth',
       {
         method: 'POST',
-        body: { token: this.token }
+        body: { token }
+      }
+    );
+
+    return ok ? [true] : [ok, res];
+  }
+
+  /* SESSION */
+  async me() {
+    const [ok, res] = await this.request_('/me', {});
+
+    return [ok, res];
+  }
+
+  async addEmail({ email, captcha } : { email: string, captcha: string }) {
+    const [ok, res] = await this.request_(
+      '/me/emails',
+      {
+        method: 'POST',
+        body: { email },
+        query: { captcha }
+      }
+    );
+
+    return ok ? [true] : [ok, res];
+  }
+
+  async setPrimaryEmail({ email } : { email: string }) {
+    const [ok, res] = await this.request_(
+      '/me/emails/set-primary',
+      {
+        method: 'POST',
+        body: { email },
+      }
+    );
+
+    return ok ? [true] : [ok, res];
+  }
+
+  async deleteEmail({ email } : { email: string }) {
+    const [ok, res] = await this.request_(
+      '/me/emails',
+      {
+        method: 'DELETE',
+        body: { email },
       }
     );
 
