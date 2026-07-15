@@ -1,0 +1,21 @@
+@use '../../styles/theme.scss' as *;
+
+
+.header {
+  display: flex;
+  padding: 1.25rem;
+  background-color: $bg1;
+  justify-content: center;
+
+  nav {
+    max-width: 60rem;
+    flex-grow: 1;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 600;
+    flex-basis: 1;
+  }
+}

@@ -1,8 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+
 import { Session } from './lib/metw';
 import App from './App.jsx';
 
+import './styles/global.scss';
 
 window.session = new Session();
 

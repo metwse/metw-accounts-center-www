@@ -1,3 +1,3 @@
 export default function EmailVerificationSessionPage() {
-  return (<div>email-verification-session</div>);
+  return (<main>email-verification-session</main>);
 }
