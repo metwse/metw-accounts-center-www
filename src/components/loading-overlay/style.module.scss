@@ -1,0 +1,26 @@
+@use '../../styles/theme.scss' as *;
+@use 'sass:color';
+
+
+@keyframes loading-overlay {
+  from { rotate: 0deg }
+  to { rotate: 360deg }
+}
+
+.loading-overlay {
+  display: flex;
+  position: absolute; inset: 0;
+  background-color: color.adjust($bg2, $alpha: -0.5);
+  backdrop-filter: blur(1px);
+  justify-content: center; align-items: center;
+  z-index: 10;
+
+  div {
+    width: 3rem; height: 3rem;
+    border: solid 0.25rem $color;
+    border-radius: 100%;
+    border-left-color: transparent;
+
+    animation: 1s linear infinite loading-overlay;
+  }
+}

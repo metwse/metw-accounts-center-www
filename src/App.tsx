@@ -1,20 +1,37 @@
 import { useEffect, useState } from 'react';
+
 import { Session } from './lib/metw';
 
 import EmailVerificationSessionPage from './pages/email-verification-session';
 import GatewayPage from './pages/gateway';
 import SessionPage from './pages/session';
-import Header from './components/header';
 
 import { Page } from './pages';
+
+import Header from './components/header';
+import LoadingOverlay from './components/loading-overlay';
 
 
 export default function App({ session }: { session: Session }) {
   const [page, setPage] = useState<Page>(Page.Loading);
+  const [loadingOverlayActive, setLoadingOverlayActive] = useState(false);
 
   const updateTitle = (title: string | null) => {
     document.title = title === null ?
       'metw accounts center' : `metw accounts center | ${title}`;
+  }
+
+  async function awaitOverlay<T>(asyncTask: () => Promise<T>): Promise<T> {
+    setLoadingOverlayActive(true)
+    let res;
+
+    try {
+      res = await asyncTask();
+
+      return res;
+    } finally {
+      setLoadingOverlayActive(false)
+    }
   }
 
   useEffect(() => {
@@ -61,12 +78,14 @@ export default function App({ session }: { session: Session }) {
     <div>
       <Header />
 
+      <LoadingOverlay isActive={loadingOverlayActive} />
+
       { page === Page.EmailVerificationSession ?
         <EmailVerificationSessionPage /> : null }
       { page === Page.Session ?
-        <SessionPage /> : null }
+        <SessionPage session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Gateway ?
-        <GatewayPage /> : null }
+        <GatewayPage session={session} awaitOverlay={awaitOverlay} /> : null }
       { page === Page.Loading ?
         <main>...</main> : null }
     </div>

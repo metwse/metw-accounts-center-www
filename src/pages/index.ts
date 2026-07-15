@@ -3,4 +3,4 @@ export enum Page {
   Session,
   Gateway,
   Loading,
-}
+};
