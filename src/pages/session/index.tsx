@@ -75,10 +75,16 @@ export default function SessionPage(
           <input type="submit" value="add email" />
         </form>
 
-        <div>
+        <div className={styles['buttons']}>
           <button onClick={
             () => { awaitOverlay(() => session.logout()); }
           }>logout</button>
+
+          <button
+            onClick={() => open(`/accounts-center-migration/authenticate?${session.token}`)}
+            >
+              log into metw.cc
+          </button>
         </div>
       </section>
     </main>
