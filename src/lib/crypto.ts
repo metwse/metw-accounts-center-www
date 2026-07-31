@@ -36,7 +36,7 @@ export async function base64EncodedPbkdf2Sha256(
     ['deriveBits']
   );
 
-  let derivedKey = await window.crypto.subtle.deriveBits(
+  const derivedKey = await window.crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
       salt: saltBits,
@@ -47,7 +47,7 @@ export async function base64EncodedPbkdf2Sha256(
     length
   );
 
-  let derivedKeyBase64 = new Uint8Array(derivedKey).toBase64();
+  const derivedKeyBase64 = new Uint8Array(derivedKey).toBase64();
 
   return derivedKeyBase64;
 }

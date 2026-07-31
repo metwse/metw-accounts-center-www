@@ -1,4 +1,4 @@
-import { CaptchaProvider } from '../../hooks/captcha';
+import CaptchaProvider from '../../hooks/captcha/provider';
 
 import SignupForm from './signup-form';
 import LoginForm from './login-form';

@@ -52,7 +52,7 @@ export default function EmailList(
                   <button onClick={() => setPrimary()}>set primary</button>
                   <button onClick={remove}>remove</button>
                 </li>
-              )
+              );
             }
           )
         }

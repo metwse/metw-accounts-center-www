@@ -23,7 +23,10 @@ export default function SignupForm() {
     const retypePassword: string = form['data-retype-password'].value!;
 
     if (retypePassword != password)
-      return alert('Passwords does not match!')
+      return alert('Passwords does not match!');
+
+    if (password.length < 4)
+      return alert('Password is too weak!');
 
     const promise = (async () =>
       await session.signup({

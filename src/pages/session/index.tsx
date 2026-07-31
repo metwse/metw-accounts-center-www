@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
 
-import { CaptchaProvider } from '../../hooks/captcha';
+import CaptchaProvider from '../../hooks/captcha/provider';
 
 import type { AccountRes } from '../../lib/metw-types';
 
@@ -30,8 +30,8 @@ export default function SessionPage() {
 
     fetchMe();
 
-    () => ignore = true;
-  }, []);
+    return () => { ignore = true; };
+  }, [session]);
 
   return (
     <main className={styles['main']}>

@@ -1,7 +1,7 @@
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
 
-import { CaptchaProvider } from '../../hooks/captcha';
+import CaptchaProvider from '../../hooks/captcha/provider';
 
 import ResendVerificationEmailForm from './resend-verification-email-form';
 
@@ -10,7 +10,7 @@ import styles from './style.module.scss';
 
 export default function EmailVerificationSessionPage() {
   const session = useSession();
-  const loading = useLoading()
+  const loading = useLoading();
 
   return (
     <main className={styles['main']}>

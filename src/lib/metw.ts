@@ -11,10 +11,10 @@ const PBKDF2_PARAMETERS = {
   salt: 'metw-accounts-center',
   iterations: 500_000,
   length: 256
-}
+};
 
 export function decodeToken(base64EncodedToken: string):
-  { id: string, scope: any }
+  { id: string, scope: string }
 {
     return JSON.parse(atob(base64EncodedToken.split('.')[1]));
 }
@@ -26,9 +26,9 @@ export function decodeToken(base64EncodedToken: string):
  * - logout: { }
  */
 export class Session extends EventTarget {
-  isLoggedIn: boolean
-  token: string
-  accountId: string
+  isLoggedIn: boolean;
+  token: string;
+  accountId: string;
 
   constructor() {
     super();
@@ -181,7 +181,7 @@ export class Session extends EventTarget {
         break;
 
       default:
-        throw 'unknown KDF';
+        throw new Error('unknown KDF');
     }
 
     const res = await this.#request<TokenRes>(

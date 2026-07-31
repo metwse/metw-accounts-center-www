@@ -28,7 +28,7 @@ export default function AuthPage() {
       alert(res.error.message);
 
     window.location.replace('/');
-  }
+  };
 
   return (
     <main className={styles['main']}>
