@@ -20,7 +20,7 @@ export default function App({ session }: { session: Session }) {
 
   const updateTitle = (title: string | null) => {
     document.title = title === null ?
-      'metw accounts center' : `metw accounts center | ${title}`;
+      'metw accounts center' : `${title} | metw accounts center`;
   }
 
   async function awaitOverlay<T>(asyncTask: () => Promise<T>): Promise<T> {
@@ -38,21 +38,27 @@ export default function App({ session }: { session: Session }) {
 
   useEffect(() => {
     const emailverificationsessionHandler = () => {
-      setPage(Page.EmailVerificationSession);
+      if (page != Page.EmailVerificationSession) {
+        setPage(Page.EmailVerificationSession);
 
-      updateTitle('Pending Email Verification');
+        updateTitle('Pending Email Verification');
+      }
     };
 
     const sessionHandler = () => {
-      setPage(Page.Session)
+      if (page != Page.Session) {
+        setPage(Page.Session)
 
-      updateTitle('Your Account');
+        updateTitle('Your Account');
+      }
     };
 
     const logoutHandler = () => {
-      setPage(Page.Gateway);
+      if (page != Page.Gateway) {
+        setPage(Page.Gateway);
 
-      updateTitle(null);
+        updateTitle(null);
+      }
     }
 
     session.addEventListener(
@@ -72,7 +78,7 @@ export default function App({ session }: { session: Session }) {
 
       session.removeEventListener('logout', logoutHandler);
     }
-  }, [page, session]);
+  }, []);
 
   useEffect(() => {
     if (getAuthToken() === undefined) {

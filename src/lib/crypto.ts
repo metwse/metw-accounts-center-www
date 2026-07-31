@@ -5,8 +5,23 @@ declare global {
   }
 }
 
-export async function keyStretchingV1(
-  keyString: string, { salt = 'metw-accounts-center', iterations = 500_000 }
+export async function legacySha256Hex(keyString: string) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(keyString);
+
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((bytes) => bytes.toString(16).padStart(2, '0'))
+    .join("");
+
+  return 'legacy:' + hashHex;
+}
+
+export async function base64EncodedPbkdf2Sha256(
+  keyString: string,
+  { salt = 'metw-accounts-center', iterations = 500_000, length = 256 }
 ) {
   const utf8KeyEncoder = new TextEncoder();
 
@@ -24,12 +39,12 @@ export async function keyStretchingV1(
   let derivedKey = await window.crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      iterations,
       salt: saltBits,
+      iterations,
       hash: 'SHA-256'
     },
     keyMaterial,
-    256
+    length
   );
 
   let derivedKeyBase64 = new Uint8Array(derivedKey).toBase64();

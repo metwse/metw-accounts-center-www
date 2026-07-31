@@ -1,7 +1,8 @@
-import { keyStretchingV1 } from './crypto';
+import { legacySha256Hex, base64EncodedPbkdf2Sha256 } from './crypto';
 import type {
   ApiActionResult, ApiResult, AccountRes, EmailAndCaptchaReq, EmailReq,
-  LoginReq, SignupReq, TokenReq, TokenRes
+  LoginReq, SignupReq, TokenReq, TokenRes,
+  KdfRes
 } from './metw-types';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
@@ -76,7 +77,7 @@ export class Session extends EventTarget {
   async #request<T>(
     path: string,
     { method = 'GET', body, query }:
-      { method?: string, body?: object, query?: Record<string, string> }
+      { method?: string, body?: object, query?: Record<string, string> } = {}
   ): Promise<ApiResult<T>> {
     let encodedQuery: string = '';
     let encodedBody: string | undefined;
@@ -117,19 +118,16 @@ export class Session extends EventTarget {
   async signup(
     { username, email, password, captcha }: SignupReq
   ): Promise<ApiResult<TokenRes>> {
-    const passwordHash = await keyStretchingV1(password, {});
+    const passwordHash = await base64EncodedPbkdf2Sha256(password, {});
 
     const res = await this.#request<TokenRes>(
       '/signup',
       {
         method: 'POST',
         body: {
-          username, email, client_password_hash: passwordHash,
-          keys: {
-            encrypted_master_key: [],
-            encrypted_private_key: [],
-            identity_key: []
-          }
+          username,
+          email,
+          client_password_hash: passwordHash,
         },
         query: { captcha }
       }
@@ -142,7 +140,38 @@ export class Session extends EventTarget {
   }
 
   async login(loginDto: LoginReq): Promise<ApiResult<TokenRes>> {
-    const passwordHash = await keyStretchingV1(loginDto.password, {});
+    const kdf_res = await this.#request<KdfRes>(
+      `/login/${loginDto.by}/${
+        loginDto.by == 'email' ? loginDto.email : loginDto.username
+      }/kdf`,
+    );
+
+    if (!kdf_res.ok)
+      return kdf_res;
+
+    let passwordHash;
+
+    switch (kdf_res.data.client_password_kdf.algorithm) {
+      case 'none':
+        passwordHash = loginDto.password;
+        break;
+
+      case 'base64_encoded_pbkdf2_sha256':
+        passwordHash = await base64EncodedPbkdf2Sha256(
+          loginDto.password,
+          {
+            ...kdf_res.data.client_password_kdf
+          }
+      );
+        break;
+
+      case 'legacy_sha256_hex':
+        passwordHash = await legacySha256Hex(loginDto.password);
+        break;
+
+      default:
+        throw 'unknown KDF';
+    }
 
     const res = await this.#request<TokenRes>(
       '/login/' + loginDto.by,

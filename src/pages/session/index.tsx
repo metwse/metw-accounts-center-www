@@ -31,7 +31,7 @@ export default function SessionPage(
     fetchMe();
 
     () => ignore = true;
-  }, [session]);
+  }, []);
 
   const addEmail = async (captcha: string) => {
     setCaptchaActive(false);

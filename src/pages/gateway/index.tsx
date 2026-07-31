@@ -101,12 +101,6 @@ export default function GatewayPage(
             </div> : null}
         </form>
       </section>
-
-      <div className={styles['migrate']}>
-        <span>already have a legacy account?</span>
-        <button onClick={() => open('/accounts-center-migration/')}>migrate</button>
-        it to the metw accounts center.
-      </div>
     </main>
   );
 }

@@ -22,15 +22,32 @@ export type SignupReq = {
 
 export type LoginReq =
   | {
-      readonly by: "username",
+      readonly by: 'username',
       readonly username: string,
       readonly password: string
     }
   | {
-      readonly by: "email",
+      readonly by: 'email',
       readonly email: string,
       readonly password: string
     };
+
+export type KdfRes =
+  {
+    readonly client_password_kdf:
+    | {
+        readonly algorithm: 'none',
+      }
+    | {
+        readonly algorithm: 'base64_encoded_pbkdf2_sha256',
+        readonly salt: string,
+        readonly iterations: number,
+        readonly length: 256,
+      }
+    | {
+        readonly algorithm: 'legacy_sha256_hex',
+      }
+  };
 
 export type EmailAndCaptchaReq = {
   readonly email: string,
