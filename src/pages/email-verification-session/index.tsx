@@ -1,37 +1,16 @@
-import { useRef, useState } from 'react';
-import TurnstileWidget from '../../components/turnstile';
+import useSession from '../../hooks/session';
+import useLoading from '../../hooks/loading-overlay';
 
-import type { Session } from '../../lib/metw';
-import type { AwaitOverlay } from '../../types';
+import { CaptchaProvider } from '../../hooks/captcha';
+
+import ResendVerificationEmailForm from './resend-verification-email-form';
 
 import styles from './style.module.scss';
 
 
-export default function EmailVerificationSessionPage(
-  { session, awaitOverlay }:
-    { session: Session, awaitOverlay: AwaitOverlay }
-) {
-  const [captchaActive, setCaptchaActive] = useState(false);
-  const retrySingupRef = useRef(null);
-
-  const signup = async (captcha: string) => {
-    setCaptchaActive(false);
-
-    const form: HTMLFormElement = retrySingupRef.current!;
-
-    const email: string = form['data-email'].value!;
-
-    const promise = (async () =>
-      await session.retrySignup({
-        email, captcha
-      })
-    )();
-
-    const res = await awaitOverlay(() => promise);
-
-    if (!res.ok)
-      alert(res.error.message);
-  };
+export default function EmailVerificationSessionPage() {
+  const session = useSession();
+  const loading = useLoading()
 
   return (
     <main className={styles['main']}>
@@ -40,21 +19,13 @@ export default function EmailVerificationSessionPage(
       <section>
         <h3>Resend verification email</h3>
 
-        <form
-          onSubmit={(e) => { e.preventDefault(); setCaptchaActive(true); }}
-          ref={retrySingupRef}
-          >
-          <input name="data-email" placeholder="email" type="email" />
-          {captchaActive ?
-            <div className={styles['captcha']}>
-              <TurnstileWidget callback={captcha => signup(captcha)} />
-            </div> : null}
-          <input type="submit" value="resend email" />
-        </form>
+        <CaptchaProvider>
+          <ResendVerificationEmailForm />
+        </CaptchaProvider>
 
         <div>
           <button onClick={
-            () => { awaitOverlay(() => session.logout()); }
+            () => { loading(() => session.logout()); }
           }>logout</button>
         </div>
       </section>

@@ -3,9 +3,9 @@ import { createContext, useContext, useRef, useState, type ReactNode } from 'rea
 import { Turnstile, useTurnstile } from 'react-turnstile';
 
 
-const CaptchaContext = createContext(async () => { return 'none' });
+const CaptchaContext = createContext<null | (() => Promise<string>)>(null);
 
-export function CaptchaContainer(
+export function CaptchaProvider(
   { children }: { children: ReactNode | ReactNode[] }
 ) {
   const [captchaActive, setCaptchaActive] = useState(false);
@@ -16,7 +16,6 @@ export function CaptchaContainer(
     return new Promise(
       (res: (res: string) => void) => {
         resolveRef.current = res;
-
         setCaptchaActive(true)
       }
     );
@@ -54,5 +53,10 @@ export function CaptchaContainer(
 }
 
 export default function useCaptcha() {
-  return useContext(CaptchaContext);
+  const captcha = useContext(CaptchaContext);
+
+  if (captcha === null)
+    throw 'Must use within CaptchaContext';
+
+  return captcha;
 }

@@ -1,13 +1,12 @@
 import { useRef } from 'react';
+import useSession from '../../hooks/session';
+import useLoading from '../../hooks/loading-overlay';
 
-import type { Session } from '../../lib/metw';
-import type { AwaitOverlay } from '../../types';
 
+export default function LoginForm() {
+  const session = useSession();
+  const loading = useLoading();
 
-export default function LoginForm(
-  { session, awaitOverlay }:
-    { session: Session, awaitOverlay: AwaitOverlay }
-) {
   const ref = useRef(null);
 
   const login = async () => {
@@ -34,7 +33,7 @@ export default function LoginForm(
       }
     })();
 
-    const res = await awaitOverlay(() => promise);
+    const res = await loading(() => promise);
 
     if (!res.ok)
       alert(res.error.message);

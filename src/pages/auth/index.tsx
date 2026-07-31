@@ -1,15 +1,17 @@
-import { decodeToken, type Session } from '../../lib/metw';
-import type { AwaitOverlay } from '../../types';
+import useLoading from '../../hooks/loading-overlay';
+import useSession from '../../hooks/session';
+
+import { decodeToken } from '../../lib/metw';
 
 import { getAuthToken } from '../../util';
 
 import styles from './style.module.scss';
 
 
-export default function AuthPage(
-  { session, awaitOverlay }:
-    { session: Session, awaitOverlay: AwaitOverlay }
-) {
+export default function AuthPage() {
+  const session = useSession();
+  const loading = useLoading();
+
   const base64EncodedToken = getAuthToken();
   const authToken = decodeToken(base64EncodedToken);
 
@@ -18,7 +20,7 @@ export default function AuthPage(
   const scopeValue = JSON.stringify(scope[0][1], null, 2);
 
   const accept = async () => {
-    const res = await awaitOverlay(() =>
+    const res = await loading(() =>
       session.auth({ token: base64EncodedToken })
     );
 

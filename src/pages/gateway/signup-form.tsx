@@ -1,15 +1,13 @@
 import { useRef } from 'react';
-
-import type { Session } from '../../lib/metw';
-import type { AwaitOverlay } from '../../types';
-
 import useCaptcha from '../../hooks/captcha';
+import useSession from '../../hooks/session';
+import useLoading from '../../hooks/loading-overlay';
 
 
-export default function SignupForm(
-  { session, awaitOverlay }:
-    { session: Session, awaitOverlay: AwaitOverlay }
-) {
+export default function SignupForm() {
+  const session = useSession();
+  const loading = useLoading();
+
   const ref = useRef(null);
 
   const executeCaptcha = useCaptcha();
@@ -33,7 +31,7 @@ export default function SignupForm(
       })
     )();
 
-    const res = await awaitOverlay(() => promise);
+    const res = await loading(() => promise);
 
     if (!res.ok)
       alert(res.error.message);

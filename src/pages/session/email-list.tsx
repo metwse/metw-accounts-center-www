@@ -1,34 +1,33 @@
 import { useState } from 'react';
+import useSession from '../../hooks/session';
+import useLoading from '../../hooks/loading-overlay';
+import useCaptcha from '../../hooks/captcha';
 
-import type { Session } from '../../lib/metw';
 import type { AccountRes } from '../../lib/metw-types';
-import type { AwaitOverlay } from '../../types';
-
-import TurnstileWidget from '../../components/turnstile';
-
-import styles from './style.module.scss';
 
 
 export default function EmailList(
-  { session, awaitOverlay, account }:
-    { session: Session, awaitOverlay: AwaitOverlay, account: AccountRes | null }
+  { account }: { account: AccountRes | null }
 ) {
-  return (
-    <section className={styles['email-list']}>
-      <h3>Your emails</h3>
+  const session = useSession();
+  const loading = useLoading();
 
+  const executeCaptcha = useCaptcha();
+
+  const [removed, setRemoved] = useState<number[]>([]);
+
+
+  return (
+    <>
       { account ? <ul>
         <li><span>primary email: {account.email}</span></li>
         {
           account.secondary_emails.map(
             (email, i) => {
-              const [captchaActive, setCaptchaActive] = useState(false);
-              const [removed, setRemoved] = useState(false);
+              const setPrimary = async () => {
+                const captcha = await executeCaptcha();
 
-              const setPrimary = async (captcha: string) => {
-                setCaptchaActive(false);
-
-                const res = await awaitOverlay(
+                const res = await loading(
                   () => session.setPrimaryEmail({ email, captcha })
                 );
 
@@ -39,28 +38,25 @@ export default function EmailList(
               };
 
               const remove = async () => {
-                const res = await awaitOverlay(
+                const res = await loading(
                   () => session.deleteEmail({ email })
                 );
 
                 if (res.ok)
-                  setRemoved(true);
+                  setRemoved(prev => [...prev, i]);
               };
 
               return (
-                <li key={i} style={{ display: removed ? 'none' : '' }}>
+                <li key={i} style={{ display: removed.includes(i) ? 'none' : '' }}>
                   <span>{email}</span>
-                  <button onClick={() => setCaptchaActive(true)}>set primary</button>
+                  <button onClick={() => setPrimary()}>set primary</button>
                   <button onClick={remove}>remove</button>
-                  {captchaActive ? <div className={styles['captcha']}>
-                    <TurnstileWidget callback={captcha => setPrimary(captcha)} />
-                  </div> : null}
                 </li>
               )
             }
           )
         }
       </ul> : null }
-    </section>
+    </>
   );
 }

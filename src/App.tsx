@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-
-import { Session } from './lib/metw';
+import useSession from './hooks/session';
 
 import EmailVerificationSessionPage from './pages/email-verification-session';
 import GatewayPage from './pages/gateway';
@@ -10,30 +9,18 @@ import AuthPage from './pages/auth';
 import { Page } from './pages';
 
 import Header from './components/header';
-import LoadingOverlay from './components/loading-overlay';
 import { getAuthToken } from './util';
+import { LoadingProvider } from './hooks/loading-overlay';
 
 
-export default function App({ session }: { session: Session }) {
-  const [loadingOverlayActive, setLoadingOverlayActive] = useState(false);
+export default function App() {
+  const session = useSession();
+
   const [page, setPage] = useState<Page>(Page.Loading);
 
   const updateTitle = (title: string | null) => {
     document.title = title === null ?
       'metw accounts center' : `${title} | metw accounts center`;
-  }
-
-  async function awaitOverlay<T>(asyncTask: () => Promise<T>): Promise<T> {
-    setLoadingOverlayActive(true)
-    let res;
-
-    try {
-      res = await asyncTask();
-
-      return res;
-    } finally {
-      setLoadingOverlayActive(false)
-    }
   }
 
   useEffect(() => {
@@ -92,19 +79,18 @@ export default function App({ session }: { session: Session }) {
     <div>
       <Header />
 
-      <LoadingOverlay isActive={loadingOverlayActive} />
-
-      { page === Page.EmailVerificationSession ?
-        <EmailVerificationSessionPage
-          session={session} awaitOverlay={awaitOverlay} /> : null }
-      { page === Page.Session ?
-        <SessionPage session={session} awaitOverlay={awaitOverlay} /> : null }
-      { page === Page.Gateway ?
-        <GatewayPage session={session} awaitOverlay={awaitOverlay} /> : null }
-      { page === Page.Auth ?
-        <AuthPage session={session} awaitOverlay={awaitOverlay} /> : null }
-      { page === Page.Loading ?
-        <main>...</main> : null }
+      <LoadingProvider>
+        { page === Page.EmailVerificationSession ?
+          <EmailVerificationSessionPage /> : null }
+        { page === Page.Session ?
+          <SessionPage /> : null }
+        { page === Page.Gateway ?
+          <GatewayPage /> : null }
+        { page === Page.Auth ?
+          <AuthPage /> : null }
+        { page === Page.Loading ?
+          <main>...</main> : null }
+      </LoadingProvider>
     </div>
   );
 }
