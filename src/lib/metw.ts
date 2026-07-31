@@ -7,6 +7,12 @@ import type {
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
 
+const PBKDF2_PARAMETERS = {
+  salt: 'metw-accounts-center',
+  iterations: 500_000,
+  length: 256
+}
+
 export function decodeToken(base64EncodedToken: string):
   { id: string, scope: any }
 {
@@ -118,7 +124,7 @@ export class Session extends EventTarget {
   async signup(
     { username, email, password, captcha }: SignupReq
   ): Promise<ApiResult<TokenRes>> {
-    const passwordHash = await base64EncodedPbkdf2Sha256(password, {});
+    const passwordHash = await base64EncodedPbkdf2Sha256(password, PBKDF2_PARAMETERS);
 
     const res = await this.#request<TokenRes>(
       '/signup',
@@ -127,7 +133,12 @@ export class Session extends EventTarget {
         body: {
           username,
           email,
-          client_password_hash: passwordHash,
+          password: {
+            base64_hash: passwordHash,
+            pbkdf2_salt: PBKDF2_PARAMETERS.salt,
+            pbkdf2_iterations: PBKDF2_PARAMETERS.iterations,
+            pbkdf2_length: PBKDF2_PARAMETERS.length
+          },
         },
         query: { captcha }
       }
