@@ -15,7 +15,7 @@ export default function EmailList(
 ) {
   return (
     <section className={styles['email-list']}>
-      <h3>Your Emails</h3>
+      <h3>Your emails</h3>
 
       { account ? <ul>
         <li><span>primary email: {account.email}</span></li>
@@ -39,9 +39,12 @@ export default function EmailList(
               };
 
               const remove = async () => {
-                await awaitOverlay(() => session.deleteEmail({ email }));
+                const res = await awaitOverlay(
+                  () => session.deleteEmail({ email })
+                );
 
-                setRemoved(true);
+                if (res.ok)
+                  setRemoved(true);
               };
 
               return (

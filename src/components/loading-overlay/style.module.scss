@@ -9,7 +9,7 @@
 
 .loading-overlay {
   display: flex;
-  position: absolute; inset: 0;
+  position: fixed; inset: 0;
   background-color: color.adjust($bg2, $alpha: -0.5);
   backdrop-filter: blur(1px);
   justify-content: center; align-items: center;

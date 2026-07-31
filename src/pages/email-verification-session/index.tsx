@@ -38,7 +38,7 @@ export default function EmailVerificationSessionPage(
       <h2>Please check out your mailbox.</h2>
 
       <section>
-        <h3>Actions</h3>
+        <h3>Resend verification email</h3>
 
         <form
           onSubmit={(e) => { e.preventDefault(); setCaptchaActive(true); }}
@@ -49,7 +49,7 @@ export default function EmailVerificationSessionPage(
             <div className={styles['captcha']}>
               <TurnstileWidget callback={captcha => signup(captcha)} />
             </div> : null}
-          <input type="submit" value="resend signup email" />
+          <input type="submit" value="resend email" />
         </form>
 
         <div>

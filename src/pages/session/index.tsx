@@ -61,7 +61,7 @@ export default function SessionPage(
       <EmailList session={session} awaitOverlay={awaitOverlay} account={me}/>
 
       <section>
-        <h3>Actions</h3>
+        <h3>Add a new email</h3>
 
         <form
           onSubmit={(e) => { e.preventDefault(); setCaptchaActive(true); }}
@@ -74,6 +74,10 @@ export default function SessionPage(
             </div> : null}
           <input type="submit" value="add email" />
         </form>
+      </section>
+
+      <section>
+        <h3>Actions</h3>
 
         <div className={styles['buttons']}>
           <button onClick={
