@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
 
@@ -18,6 +18,8 @@ export default function SessionPage() {
 
   const [me, setMe] = useState<null | AccountRes>(null);
 
+  const changePasswordRef = useRef(null);
+
   useEffect(() => {
     let ignore = false;
 
@@ -32,6 +34,31 @@ export default function SessionPage() {
 
     return () => { ignore = true; };
   }, [session]);
+
+  const changePassword = async () => {
+    const form: HTMLFormElement = changePasswordRef.current!;
+
+    const currentPassword: string = form['data-current-password'].value!;
+    const newPassword: string = form['data-new-password'].value!;
+    const retypePassword: string = form['data-retype-password'].value!;
+
+    if (retypePassword != newPassword)
+      return alert('Passwords does not match!');
+
+    if (newPassword.length < 4)
+      return alert('Password is too weak!');
+
+    const promise = (async () =>
+      await session.changePassword({ currentPassword, newPassword })
+    )();
+
+    const res = await loading(() => promise);
+
+    if (!res.ok)
+      alert(res.error.message);
+    else
+      alert('Success!');
+  };
 
   return (
     <main className={styles['main']}>
@@ -67,6 +94,36 @@ export default function SessionPage() {
               log into metw.cc
           </button>
         </div>
+      </section>
+
+      <section>
+        <h3>Change password</h3>
+
+        <form
+          onSubmit={(e) => { e.preventDefault(); changePassword(); }}
+          className={styles['change-password']}
+          ref={changePasswordRef}
+          >
+          <span>current password</span>
+          <input
+            name="data-current-password"
+            type="password"
+            placeholder="current password"
+            />
+          <span>new password</span>
+          <input
+            name="data-new-password"
+            type="password"
+            placeholder="new password"
+           />
+          <span>retype password</span>
+          <input
+            name="data-retype-password"
+            type="password"
+            placeholder="retype password"
+           />
+          <input type="submit" value="change" />
+        </form>
       </section>
     </main>
   );

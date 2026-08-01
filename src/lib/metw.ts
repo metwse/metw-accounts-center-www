@@ -289,4 +289,59 @@ export class Session extends EventTarget {
       }
     );
   }
+
+  async changePassword(
+    { currentPassword, newPassword }:
+      { currentPassword: string, newPassword: string}
+  ): Promise<ApiActionResult> {
+    const kdf_res = await this.#request<KdfRes>(
+      `/login/id/${this.accountId}/kdf`,
+    );
+
+    if (!kdf_res.ok)
+      return kdf_res;
+
+    let currentPasswordHash;
+    const newPasswordHash = await base64EncodedPbkdf2Sha256(
+      newPassword, PBKDF2_PARAMETERS
+    );
+
+    switch (kdf_res.data.client_password_kdf.algorithm) {
+      case 'none':
+        currentPasswordHash = currentPassword;
+        break;
+
+      case 'base64_encoded_pbkdf2_sha256':
+        currentPasswordHash = await base64EncodedPbkdf2Sha256(
+          currentPassword,
+          {
+            ...kdf_res.data.client_password_kdf
+          }
+      );
+        break;
+
+      case 'legacy_sha256_hex':
+        currentPasswordHash = await legacySha256Hex(currentPassword);
+        break;
+
+      default:
+        throw new Error('unknown KDF');
+    }
+
+    return await this.#request<TokenRes>(
+      '/me/change-password',
+      {
+        method: 'POST',
+        body: {
+          current_password_hash: currentPasswordHash,
+          new_password: {
+            base64_hash: newPasswordHash,
+            pbkdf2_salt: PBKDF2_PARAMETERS.salt,
+            pbkdf2_iterations: PBKDF2_PARAMETERS.iterations,
+            pbkdf2_length: PBKDF2_PARAMETERS.length
+          }
+        },
+      }
+    );
+  }
 }
