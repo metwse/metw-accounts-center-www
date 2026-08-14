@@ -20,17 +20,10 @@ export type SignupReq = {
   readonly captcha: string
 };
 
-export type LoginReq =
-  | {
-      readonly by: 'username',
-      readonly username: string,
-      readonly password: string
-    }
-  | {
-      readonly by: 'email',
-      readonly email: string,
-      readonly password: string
-    };
+export type LoginReq = {
+  readonly account: string,
+  readonly password: string
+};
 
 export type KdfRes =
   {

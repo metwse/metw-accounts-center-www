@@ -152,9 +152,7 @@ export class Session extends EventTarget {
 
   async login(loginDto: LoginReq): Promise<ApiResult<TokenRes>> {
     const kdf_res = await this.#request<KdfRes>(
-      `/login/${loginDto.by}/${
-        loginDto.by == 'email' ? loginDto.email : loginDto.username
-      }/kdf`,
+      `/login/${loginDto.account}/kdf`,
     );
 
     if (!kdf_res.ok)
@@ -185,12 +183,11 @@ export class Session extends EventTarget {
     }
 
     const res = await this.#request<TokenRes>(
-      '/login/' + loginDto.by,
+      '/login',
       {
         method: 'POST',
         body: {
-          ...(loginDto.by == 'email' ?
-              { email: loginDto.email } : { username: loginDto.username }),
+          account: loginDto.account,
           client_password_hash: passwordHash,
         },
       }
@@ -295,7 +292,7 @@ export class Session extends EventTarget {
       { currentPassword: string, newPassword: string}
   ): Promise<ApiActionResult> {
     const kdf_res = await this.#request<KdfRes>(
-      `/login/id/${this.accountId}/kdf`,
+      `/login/${this.accountId}/kdf`,
     );
 
     if (!kdf_res.ok)
