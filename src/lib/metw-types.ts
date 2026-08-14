@@ -21,7 +21,7 @@ export type SignupReq = {
 };
 
 export type LoginReq = {
-  readonly account: string,
+  readonly accountIdentifier: string,
   readonly password: string
 };
 

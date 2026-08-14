@@ -152,7 +152,7 @@ export class Session extends EventTarget {
 
   async login(loginDto: LoginReq): Promise<ApiResult<TokenRes>> {
     const kdf_res = await this.#request<KdfRes>(
-      `/login/${loginDto.account}/kdf`,
+      `/login/${loginDto.accountIdentifier}/kdf`,
     );
 
     if (!kdf_res.ok)
@@ -187,7 +187,7 @@ export class Session extends EventTarget {
       {
         method: 'POST',
         body: {
-          account: loginDto.account,
+          account_identifier: loginDto.accountIdentifier,
           client_password_hash: passwordHash,
         },
       }

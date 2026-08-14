@@ -12,11 +12,11 @@ export default function LoginForm() {
   const login = async () => {
     const form: HTMLFormElement = ref.current!;
 
-    const accountIdentifier: string = form['data-id'].value!;
+    const accountIdentifier: string = form['data-identifier'].value!;
     const password: string = form['data-password'].value!;
 
     const promise = (async () => await session.login({
-      account: accountIdentifier,
+      accountIdentifier,
       password,
     }))();
 
@@ -33,7 +33,7 @@ export default function LoginForm() {
       ref={ref}
       >
       <span>username/email</span>
-      <input name="data-id" placeholder="username or email" />
+      <input name="data-identifier" placeholder="username or email" />
       <span>password</span>
       <input name="data-password" type="password" placeholder="password" />
       <input type="submit" value="log in" />
