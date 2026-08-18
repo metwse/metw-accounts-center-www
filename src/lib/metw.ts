@@ -56,6 +56,8 @@ export class Session extends EventTarget {
 
   #removeToken() {
     this.isLoggedIn = false;
+    this.token = '';
+    this.accountId = '';
 
     window.localStorage.removeItem('token');
 
@@ -241,7 +243,7 @@ export class Session extends EventTarget {
 
   /* AUTHORIZATION */
   async auth({ token }: TokenReq): Promise<ApiActionResult> {
-    const scope = Object.entries(decodeToken(token).scope);
+    const scope = Object.entries(decodeToken(token)!.scope);
     const scopeName = scope[0][0];
 
     const res = await this.#request(

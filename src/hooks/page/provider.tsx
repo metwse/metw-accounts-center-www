@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 
 import { PageContext } from '.';
 import { PageId, type Page } from '../../pages';
@@ -13,7 +13,7 @@ export default function PageProvider(
     id: getAuthToken() !== undefined ? PageId.Auth : PageId.Loading
   });
 
-  const setPageOverride = useMemo(() => (newPage: Page | PageId) => {
+  const setPageOverride = useCallback(() => (newPage: Page | PageId) => {
     let id;
 
     if (typeof newPage === 'object') {
