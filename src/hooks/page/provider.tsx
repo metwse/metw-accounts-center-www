@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 
 import { PageContext } from '.';
 import { PageId, type Page } from '../../pages';
@@ -13,7 +13,7 @@ export default function PageProvider(
     id: getAuthToken() !== undefined ? PageId.Auth : PageId.Loading
   });
 
-  const setPageOverride = useCallback(() => (newPage: Page | PageId) => {
+  const setPageOverride = useMemo(() => (newPage: Page | PageId) => {
     let id;
 
     if (typeof newPage === 'object') {
@@ -38,7 +38,7 @@ export default function PageProvider(
 
     document.title = title === null ?
       'metw accounts center' : `${title} | metw accounts center`;
-  }, []);
+  }, [setPage]);
 
   return <PageContext value={[page, setPageOverride]}>{children}</PageContext>;
 }
