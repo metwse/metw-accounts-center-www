@@ -14,9 +14,13 @@ const PBKDF2_PARAMETERS = {
 };
 
 export function decodeToken(base64EncodedToken: string):
-  { id: string, scope: string }
+  { id: string, scope: string } | null
 {
+  try {
     return JSON.parse(atob(base64EncodedToken.split('.')[1]));
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -42,10 +46,12 @@ export class Session extends EventTarget {
   loadTokenFromLocalStorage() {
     const savedToken = window.localStorage.getItem('token');
 
-    if (savedToken !== null)
-      this.#updateToken(savedToken);
-    else
+    if (savedToken !== null) {
+      if (this.#updateToken(savedToken) == false)
+        this.#removeToken();
+    } else {
       this.#removeToken();
+    }
   }
 
   #removeToken() {
@@ -58,13 +64,17 @@ export class Session extends EventTarget {
     );
   }
 
-  #updateToken(newToken: string) {
+  #updateToken(newToken: string): boolean {
+    const decodedToken = decodeToken(newToken);
+
+    if (!decodedToken)
+      return false;
+
     this.isLoggedIn = true;
     this.token = newToken;
 
     window.localStorage.setItem('token', newToken);
 
-    const decodedToken = decodeToken(newToken);
     this.accountId = decodedToken.id;
 
     if (decodedToken.scope == 'EmailVerificationSession') {
@@ -78,6 +88,8 @@ export class Session extends EventTarget {
         new CustomEvent('login_session', {})
       );
     }
+
+    return true;
   }
 
   async #request<T>(

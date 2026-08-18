@@ -15,7 +15,9 @@ export default function AuthPage() {
   const base64EncodedToken = getAuthToken();
   const authToken = decodeToken(base64EncodedToken);
 
-  const scope = Object.entries(authToken.scope);
+  // TODO: handle invalid tokens, authToken is possibly null
+  const scope = Object.entries(authToken!.scope);
+
   const scopeName = scope[0][0];
   const scopeValue = JSON.stringify(scope[0][1], null, 2);
 
@@ -26,8 +28,6 @@ export default function AuthPage() {
 
     if (!res.ok)
       alert(res.error.message);
-
-    window.location.replace('/');
   };
 
   return (
