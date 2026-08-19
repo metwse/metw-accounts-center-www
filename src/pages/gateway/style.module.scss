@@ -1,5 +1,6 @@
 .main {
-  align-items: center;
+  justify-content: center; align-items: center;
+  flex-grow: 1; max-height: 32rem;
 
   section {
     position: relative;
@@ -13,4 +14,14 @@
 
     input { min-width: 0; }
   }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  img { width: 3rem; }
+
+  span { font-size: 1.5rem; }
 }

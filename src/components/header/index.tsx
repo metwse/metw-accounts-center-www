@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header className={styles['header']}>
       <nav>
-        <h1>metw accounts center</h1>
+        <h1>Accounts Center</h1>
       </nav>
     </header>
   );

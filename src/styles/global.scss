@@ -13,13 +13,17 @@ body {
   background-color: $bg2;
 }
 
-body, #root { min-height: 100dvh; }
+#root {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
 
 main {
   display: flex;
-  margin: 0 auto; padding: 1rem 2rem;
-  max-width: 50rem;
-  flex-direction: column; gap: 0.75rem;
+  padding: 1rem 2rem;
+  max-width: 50rem; width: 100%;
+  flex-direction: column; gap: 0.75rem; align-self: center;
 }
 
 section {

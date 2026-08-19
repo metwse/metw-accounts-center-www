@@ -15,6 +15,11 @@ export default function GatewayPage() {
 
   return (
     <main className={styles['main']}>
+      <div className={styles['logo']}>
+        <img src="/img/logo-white.svg" />
+        <span><b>metw</b>.cc</span>
+      </div>
+
       { page.id === PageId.Login ?
         <>
         <section>

@@ -42,7 +42,7 @@ export default function PageProvider(
       }
 
       document.title = title === null ?
-        'metw accounts center' : `${title} | metw accounts center`;
+        'Accounts Center' : `${title} | Accounts Center`;
     },
     [setPage]
   );
