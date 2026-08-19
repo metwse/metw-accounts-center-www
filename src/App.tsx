@@ -16,19 +16,19 @@ export default function App() {
   const [page, _] = usePage();
 
   return (
-    <div>
+    <>
       <Header />
 
       { page.id === PageId.EmailVerificationSession ?
         <EmailVerificationSessionPage /> : null }
       { page.id === PageId.Session ?
         <SessionPage /> : null }
-      { page.id === PageId.Gateway ?
+      { page.id === PageId.Login || page.id === PageId.Signup ?
         <GatewayPage /> : null }
       { page.id === PageId.Auth ?
         <AuthPage /> : null }
 
       <SyncUrl />
-    </div>
+    </>
   );
 }

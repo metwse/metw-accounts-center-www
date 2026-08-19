@@ -13,6 +13,8 @@ body {
   background-color: $bg2;
 }
 
+body, #root { min-height: 100dvh; }
+
 main {
   display: flex;
   margin: 0 auto; padding: 1rem 2rem;
@@ -70,4 +72,10 @@ input:not([type="submit"]) {
   outline: none;
   border-bottom: 0.125em solid $primary;
   appearance: textfield;
+}
+
+a {
+  color: $primary;
+  text-decoration: underline;
+  cursor: pointer
 }

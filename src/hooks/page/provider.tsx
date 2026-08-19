@@ -14,6 +14,7 @@ export default function PageProvider(
     () => (newPageOrId: Page | PageId, pushstate: boolean) => {
       let newPage: Page = (typeof newPageOrId === 'object') ?
         newPageOrId : { id: newPageOrId };
+
       const id = newPage.id;
 
       setPage((prev) => {

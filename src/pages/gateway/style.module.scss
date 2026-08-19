@@ -1,8 +1,10 @@
 .main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  align-items: center;
 
-  section { position: relative; }
+  section {
+    position: relative;
+    max-width: 32rem; width: 100%;
+  }
 
   form {
     display: grid;
@@ -11,8 +13,4 @@
 
     input { min-width: 0; }
   }
-}
-
-@media (max-width: 40rem) {
-  .main { display: flex; }
 }

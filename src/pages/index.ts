@@ -1,6 +1,5 @@
 export enum PageId {
   EmailVerificationSession, Session, /* not directly accesible */
-  Gateway,
   Login, Signup, /* /login and /signup endpoints */
   Auth, /* /auth */
   NotFound,
@@ -9,7 +8,6 @@ export enum PageId {
 
 export type Page =
     { readonly id: PageId.EmailVerificationSession | PageId.Session, }
-  | { readonly id: PageId.Gateway, }
   | { readonly id: PageId.Auth, readonly token?: string, }
   | { readonly id: PageId.Login | PageId.Signup, readonly redirectUrl?: string }
   | { readonly id: PageId.NotFound, }
@@ -22,8 +20,6 @@ const endpointMap: Record<PageId, string> = {
   [PageId.Auth]: '/auth',
   [PageId.NotFound]: '/404',
   [PageId.Loading]: '/',
-
-  [PageId.Gateway]: '/', /* TODO: remove */
 };
 
 const endpointRevMap: Record<string, PageId> = {

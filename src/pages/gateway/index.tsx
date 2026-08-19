@@ -1,27 +1,49 @@
 import CaptchaProvider from '../../hooks/captcha/provider';
+import usePage from '../../hooks/page';
+
+import { PageId } from '..';
 
 import SignupForm from './signup-form';
 import LoginForm from './login-form';
 
 import styles from './style.module.scss';
+import { AFunction } from '../../components/a-function';
 
 
 export default function GatewayPage() {
+  const [page, setPage] = usePage();
+
   return (
     <main className={styles['main']}>
-      <section>
-        <h3>Log into your account</h3>
+      { page.id === PageId.Login ?
+        <>
+        <section>
+          <h3>Log into your account</h3>
 
-        <LoginForm />
-      </section>
+          <LoginForm />
+        </section>
 
-      <section>
-        <h3>Create a new account</h3>
+        <div>
+          don't have an account?&nbsp;
+          <AFunction onClick={() => setPage(PageId.Signup)} href="/login">create one</AFunction>
+        </div>
+        </> : null }
 
-        <CaptchaProvider>
-          <SignupForm />
-        </CaptchaProvider>
-      </section>
+      { page.id === PageId.Signup ?
+        <>
+        <section>
+          <h3>Create a new account</h3>
+
+          <CaptchaProvider>
+            <SignupForm />
+          </CaptchaProvider>
+        </section>
+
+        <div>
+          already have an account?&nbsp;
+          <AFunction onClick={() => setPage(PageId.Login)}>login</AFunction>
+        </div>
+        </> : null }
     </main>
   );
 }

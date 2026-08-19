@@ -16,7 +16,7 @@ export default function SyncUrl() {
 
     const sessionHandler = () => setPage(PageId.Session);
 
-    const logoutHandler = () => setPage(PageId.Gateway);
+    const logoutHandler = () => setPage(PageId.Login);
 
     session.addEventListener(
       'login_emailverificationsession', emailverificationsessionHandler
