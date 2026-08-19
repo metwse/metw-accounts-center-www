@@ -15,8 +15,6 @@ export default function SignupForm() {
   const signup = async () => {
     const form: HTMLFormElement = ref.current!;
 
-    const captcha = await executeCaptcha();
-
     const username: string = form['data-username'].value!;
     const email: string = form['data-email'].value!;
     const password: string = form['data-password'].value!;
@@ -27,6 +25,8 @@ export default function SignupForm() {
 
     if (password.length < 4)
       return alert('Password is too weak!');
+
+    const captcha = await executeCaptcha();
 
     const promise = (async () =>
       await session.signup({
@@ -46,17 +46,23 @@ export default function SignupForm() {
       ref={ref}
       >
       <span>username</span>
-      <input name="data-username" placeholder="username" />
+      <input name="data-username" placeholder="username" required />
       <span>email</span>
-      <input name="data-email" placeholder="email" type="email" />
+      <input name="data-email" placeholder="email" type="email" required />
       <span>password</span>
-      <input name="data-password" type="password" placeholder="password" />
+      <input
+        name="data-password"
+        type="password"
+        placeholder="password"
+        required
+        />
       <span></span>
       <input
         name="data-retype-password"
         type="password"
         placeholder="retype password"
-      />
+        required
+        />
       <input type="submit" value="signup" />
     </form>
   );

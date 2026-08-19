@@ -5,7 +5,7 @@ import usePage from '../hooks/page';
 import { PageId } from '.';
 
 
-export default function LoadingPage() {
+export default function SyncUrl() {
   const session = useSession();
 
   const [page, setPage] = usePage();

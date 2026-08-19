@@ -9,7 +9,7 @@ import { PageId } from './pages';
 
 import Header from './components/header';
 
-import LoadingPage from './pages/loading';
+import SyncUrl from './pages/sync-url';
 
 
 export default function App() {
@@ -28,7 +28,7 @@ export default function App() {
       { page.id === PageId.Auth ?
         <AuthPage /> : null }
 
-      <LoadingPage />
+      <SyncUrl />
     </div>
   );
 }

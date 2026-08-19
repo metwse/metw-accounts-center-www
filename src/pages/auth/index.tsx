@@ -1,9 +1,10 @@
 import useLoading from '../../hooks/loading-overlay';
+import usePage from '../../hooks/page';
 import useSession from '../../hooks/session';
 
-import { decodeToken } from '../../lib/metw';
+import { PageId } from '..';
 
-import { getAuthToken } from '../../util';
+import { decodeToken } from '../../lib/metw';
 
 import styles from './style.module.scss';
 
@@ -11,13 +12,22 @@ import styles from './style.module.scss';
 export default function AuthPage() {
   const session = useSession();
   const loading = useLoading();
+  const [page, _] = usePage();
 
-  const base64EncodedToken = getAuthToken();
+  if (page.id !== PageId.Auth)
+    return <main>Must use AuthPage whitin page.id == PageId.Auth</main>;
+
+  const base64EncodedToken = page.token;
+
+  if (!base64EncodedToken)
+    return <main>no token provided</main>;
+
   const authToken = decodeToken(base64EncodedToken);
 
-  // TODO: handle invalid tokens, authToken is possibly null
-  const scope = Object.entries(authToken!.scope);
+  if (!authToken)
+    return <main>provided token is invalid</main>;
 
+  const scope = Object.entries(authToken.scope);
   const scopeName = scope[0][0];
   const scopeValue = JSON.stringify(scope[0][1], null, 2);
 
