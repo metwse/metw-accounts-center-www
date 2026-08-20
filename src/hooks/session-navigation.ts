@@ -2,40 +2,38 @@ import { useEffect } from 'react';
 import useSession from '../hooks/session';
 import usePage from '../hooks/page';
 
-import { PageId, performRedirect } from '.';
+import { PageId, performRedirect } from '../pages';
 
 
-export default function SessionRouter() {
+export default function useSessionNavigation() {
   const session = useSession();
 
   const { page, navigate } = usePage();
 
   useEffect(() => {
-    const emailverificationsessionHandler =
+    const handleEmailVerificationLogin =
       () => navigate(PageId.EmailVerificationSession);
 
-    const sessionHandler = () => {
-      navigate(PageId.Session);
-    };
+    const handleSessionLogin = () => navigate(PageId.Session);
 
-    const logoutHandler = () => navigate(PageId.Login);
+    const handleLogout = () => navigate(PageId.Login);
 
     session.addEventListener(
-      'login_emailverificationsession', emailverificationsessionHandler
+      'login_emailverificationsession', handleEmailVerificationLogin
     );
 
-    session.addEventListener('login_session', sessionHandler);
+    session.addEventListener('login_session', handleSessionLogin);
 
-    session.addEventListener('logout', logoutHandler);
+    session.addEventListener('logout', handleLogout);
 
     return () => {
       session.removeEventListener(
-        'login_emailverificationsession', emailverificationsessionHandler
+        'login_emailverificationsession', handleEmailVerificationLogin
       );
 
-      session.removeEventListener('login_session', sessionHandler);
+      session.removeEventListener('login_session', handleSessionLogin);
 
-      session.removeEventListener('logout', logoutHandler);
+      session.removeEventListener('logout', handleLogout);
     };
   }, [session, navigate]);
 
@@ -52,6 +50,4 @@ export default function SessionRouter() {
       }
     }
   }, [page, session]);
-
-  return null;
 }

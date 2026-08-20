@@ -92,13 +92,12 @@ export function pageFromLocation(): Page {
   return { id, token, redirectUrl };
 }
 
-export function performRedirect(redirectUrl?: string): boolean {
+export function performRedirect(redirectUrl?: string): void {
   if (!redirectUrl)
-    return false;
+    return;
 
   if (!redirectUrl.startsWith('/'))
     throw new Error('Invalid rediret URL');
 
   window.location.replace(redirectUrl);
-  return true;
 }

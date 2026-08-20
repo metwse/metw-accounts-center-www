@@ -1,14 +1,16 @@
 import { createContext, useContext } from 'react';
 import type { Page, PageId } from '../../pages';
 
-export const PageContext =
-  createContext<
-    null | { page: Page, navigate: (destination: Page | PageId) => void }
-  >(null);
 
-export default function usePage():
-  { page: Page, navigate: (destination: Page | PageId) => void }
-{
+type PageContextValue = {
+  page: Page,
+  navigate: (destination: Page | PageId) => void
+};
+
+export const PageContext =
+  createContext<PageContextValue | null>(null);
+
+export default function usePage(): PageContextValue {
   const page = useContext(PageContext);
 
   if (!page)

@@ -46,7 +46,7 @@ export default function SignupForm() {
 
     const promise = (async () =>
       await session.signup({
-        username, email, password, captcha, redirect_url: redirectUrl
+        username, email, password, captcha, redirectUrl
       })
     )();
 

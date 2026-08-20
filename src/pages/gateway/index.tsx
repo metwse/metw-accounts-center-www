@@ -7,7 +7,7 @@ import SignupForm from './signup-form';
 import LoginForm from './login-form';
 
 import styles from './style.module.scss';
-import { AFunction } from '../../components/a-function';
+import { AppLink } from '../../components/app-link';
 
 
 export default function GatewayPage() {
@@ -30,7 +30,7 @@ export default function GatewayPage() {
 
         <div>
           don't have an account?&nbsp;
-          <AFunction onClick={() => navigate(PageId.Signup)} href="/login">create one</AFunction>
+          <AppLink onClick={() => navigate(PageId.Signup)} href="/login">create one</AppLink>
         </div>
         </> : null }
 
@@ -46,7 +46,7 @@ export default function GatewayPage() {
 
         <div>
           already have an account?&nbsp;
-          <AFunction onClick={() => navigate(PageId.Login)}>login</AFunction>
+          <AppLink onClick={() => navigate(PageId.Login)}>login</AppLink>
         </div>
         </> : null }
     </main>

@@ -12,21 +12,60 @@ export type ApiActionResult =
 
 
 /* REQUEST TYPES */
-export type SignupReq = {
+export type SignUpRequest = {
   readonly username: string,
   readonly email: string,
   readonly password: string,
-  readonly redirect_url?: string,
+  readonly redirectUrl?: string,
 
   readonly captcha: string
 };
 
-export type LoginReq = {
+export type LoginRequest = {
   readonly accountIdentifier: string,
   readonly password: string
 };
 
-export type KdfRes =
+export type RetrySignUpRequest = {
+  readonly email: string,
+  readonly redirectUrl?: string,
+
+  readonly captcha: string
+};
+
+
+export type AddEmailRequest = {
+  readonly email: string,
+  readonly captcha: string
+};
+
+export type DeleteEmailRequest = {
+  readonly email: string,
+};
+
+export type SetPrimaryEmailRequest = {
+  readonly email: string,
+  readonly captcha: string
+};
+
+export type AuthRequest = {
+  readonly token: string
+};
+
+
+/* RESPONSE TYPES */
+export type TokenResponse = {
+  readonly token: string
+}
+
+export type AccountResponse = {
+  readonly username: string,
+  readonly email?: string,
+  readonly secondary_emails: string[],
+  readonly username_aliasses: string[],
+}
+
+export type KdfResponse =
   {
     readonly client_password_kdf:
     | {
@@ -43,35 +82,3 @@ export type KdfRes =
       }
   };
 
-export type RetrySignupReq = {
-  readonly email: string,
-  readonly redirect_url?: string,
-
-  readonly captcha: string
-};
-
-export type EmailAndCaptchaReq = {
-  readonly email: string,
-  readonly captcha: string
-};
-
-export type EmailReq = {
-  readonly email: string,
-};
-
-export type TokenReq = {
-  readonly token: string
-};
-
-
-/* RESPONSE TYPES */
-export type TokenRes = {
-  readonly token: string
-}
-
-export type AccountRes = {
-  readonly username: string,
-  readonly email?: string,
-  secondary_emails: string[],
-  readonly username_aliasses: string[],
-}

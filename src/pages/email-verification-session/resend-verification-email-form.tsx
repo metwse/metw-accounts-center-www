@@ -28,7 +28,7 @@ export default function ResendVerificationEmailForm() {
       redirectUrl = page.redirectUrl;
 
     const promise = (async () =>
-      await session.retrySignup({ email, captcha, redirect_url: redirectUrl })
+      await session.retrySignup({ email, captcha, redirectUrl })
     )();
 
     const res = await loading(() => promise);

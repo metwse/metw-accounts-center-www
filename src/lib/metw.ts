@@ -1,9 +1,16 @@
 import { legacySha256Hex, base64EncodedPbkdf2Sha256 } from './crypto';
 import type {
-  ApiActionResult, ApiResult, AccountRes, EmailAndCaptchaReq, EmailReq,
-  LoginReq, SignupReq, TokenReq, TokenRes,
-  KdfRes,
-  RetrySignupReq
+  AccountResponse,
+  AddEmailRequest,
+  ApiActionResult, ApiResult,
+  AuthRequest,
+  DeleteEmailRequest,
+  KdfResponse,
+  LoginRequest,
+  RetrySignUpRequest,
+  SetPrimaryEmailRequest,
+  SignUpRequest,
+  TokenResponse
 } from './metw-types';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
@@ -169,11 +176,11 @@ export class Session extends EventTarget {
 
   /* AUTHENTICATION */
   async signup(
-    { username, email, password, redirect_url, captcha }: SignupReq
-  ): Promise<ApiResult<TokenRes>> {
+    { username, email, password, redirectUrl, captcha }: SignUpRequest
+  ): Promise<ApiResult<TokenResponse>> {
     const passwordHash = await base64EncodedPbkdf2Sha256(password, PBKDF2_PARAMETERS);
 
-    const res = await this.#request<TokenRes>(
+    const res = await this.#request<TokenResponse>(
       '/signup',
       {
         method: 'POST',
@@ -186,7 +193,7 @@ export class Session extends EventTarget {
             pbkdf2_iterations: PBKDF2_PARAMETERS.iterations,
             pbkdf2_length: PBKDF2_PARAMETERS.length
           },
-          redirect_url
+          redirect_url: redirectUrl
         },
         query: { captcha }
       }
@@ -198,8 +205,8 @@ export class Session extends EventTarget {
     return res;
   }
 
-  async login(loginDto: LoginReq): Promise<ApiResult<TokenRes>> {
-    const kdf_res = await this.#request<KdfRes>(
+  async login(loginDto: LoginRequest): Promise<ApiResult<TokenResponse>> {
+    const kdf_res = await this.#request<KdfResponse>(
       `/login/${loginDto.accountIdentifier}/kdf`,
     );
 
@@ -230,7 +237,7 @@ export class Session extends EventTarget {
         throw new Error('unknown KDF');
     }
 
-    const res = await this.#request<TokenRes>(
+    const res = await this.#request<TokenResponse>(
       '/login',
       {
         method: 'POST',
@@ -263,20 +270,20 @@ export class Session extends EventTarget {
 
   /* EMAIL VERIFICATION SESSION */
   async retrySignup(
-    { email, captcha, redirect_url }: RetrySignupReq
+    { email, captcha, redirectUrl }: RetrySignUpRequest
   ): Promise<ApiActionResult> {
     return await this.#request(
       '/signup/retry',
       {
         method: 'POST',
-        body: { email, redirect_url },
+        body: { email, redirect_url: redirectUrl },
         query: { captcha }
       }
     );
   }
 
   /* AUTHORIZATION */
-  async auth({ token }: TokenReq): Promise<ApiActionResult> {
+  async auth({ token }: AuthRequest): Promise<ApiActionResult> {
     const scope = Object.entries(decodeToken(token)!.scope);
     const scopeName = scope[0][0];
 
@@ -295,12 +302,12 @@ export class Session extends EventTarget {
   }
 
   /* SESSION */
-  async me(): Promise<ApiResult<AccountRes>> {
+  async me(): Promise<ApiResult<AccountResponse>> {
     return await this.#request('/me', {});
   }
 
   async addEmail(
-    { email, captcha }: EmailAndCaptchaReq
+    { email, captcha }: AddEmailRequest
   ): Promise<ApiActionResult> {
     return await this.#request(
       '/me/emails',
@@ -313,7 +320,7 @@ export class Session extends EventTarget {
   }
 
   async setPrimaryEmail(
-    { email, captcha }: EmailAndCaptchaReq
+    { email, captcha }: SetPrimaryEmailRequest
   ): Promise<ApiActionResult> {
     return await this.#request(
       '/me/emails/set-primary',
@@ -325,7 +332,7 @@ export class Session extends EventTarget {
     );
   }
 
-  async deleteEmail({ email }: EmailReq): Promise<ApiActionResult> {
+  async deleteEmail({ email }: DeleteEmailRequest): Promise<ApiActionResult> {
     return await this.#request(
       '/me/emails',
       {
@@ -339,7 +346,7 @@ export class Session extends EventTarget {
     { currentPassword, newPassword }:
       { currentPassword: string, newPassword: string}
   ): Promise<ApiActionResult> {
-    const kdf_res = await this.#request<KdfRes>(
+    const kdf_res = await this.#request<KdfResponse>(
       `/login/${this.accountId}/kdf`,
     );
 
@@ -373,7 +380,7 @@ export class Session extends EventTarget {
         throw new Error('unknown KDF');
     }
 
-    return await this.#request<TokenRes>(
+    return await this.#request<TokenResponse>(
       '/me/change-password',
       {
         method: 'POST',

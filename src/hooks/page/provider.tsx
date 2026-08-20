@@ -8,7 +8,7 @@ import {
 } from '../../pages';
 
 
-function resolveDestionation(currentPage: Page, destination: Page | PageId): Page {
+function resolveDestination(currentPage: Page, destination: Page | PageId): Page {
   const nextPage: Page = typeof destination === 'object' ?
     destination : { id: destination };
 
@@ -27,11 +27,11 @@ export default function PageProvider(
   { children }: { children: ReactNode | ReactNode[] }
 ) {
 
-  const [page, setPage] = useState<Page>(pageFromLocation());
+  const [page, setPage] = useState<Page>(pageFromLocation);
 
   const navigate = useCallback(
     (destination: Page | PageId) => {
-      const nextPage = resolveDestionation(page, destination);
+      const nextPage = resolveDestination(page, destination);
       const nextUrl = pageToLocation(nextPage);
 
       window.history.pushState(null, '', nextUrl);

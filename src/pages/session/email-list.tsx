@@ -3,11 +3,11 @@ import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
 import useCaptcha from '../../hooks/captcha';
 
-import type { AccountRes } from '../../lib/metw-types';
+import type { AccountResponse } from '../../lib/metw-types';
 
 
 export default function EmailList(
-  { account }: { account: AccountRes | null }
+  { account }: { account: AccountResponse | null }
 ) {
   const session = useSession();
   const loading = useLoading();

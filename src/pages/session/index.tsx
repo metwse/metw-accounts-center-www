@@ -4,7 +4,7 @@ import useLoading from '../../hooks/loading-overlay';
 
 import CaptchaProvider from '../../hooks/captcha/provider';
 
-import type { AccountRes } from '../../lib/metw-types';
+import type { AccountResponse } from '../../lib/metw-types';
 
 import EmailList from './email-list';
 import AddEmailForm from './add-email-form';
@@ -16,7 +16,7 @@ export default function SessionPage() {
   const session = useSession();
   const loading = useLoading();
 
-  const [me, setMe] = useState<null | AccountRes>(null);
+  const [me, setMe] = useState<null | AccountResponse>(null);
 
   const changePasswordRef = useRef(null);
 
