@@ -14,7 +14,9 @@ export default function SyncUrl() {
     const emailverificationsessionHandler =
       () => setPage(PageId.EmailVerificationSession);
 
-    const sessionHandler = () => setPage(PageId.Session);
+    const sessionHandler = () => {
+      setPage(PageId.Session);
+    };
 
     const logoutHandler = () => setPage(PageId.Login);
 
@@ -38,8 +40,16 @@ export default function SyncUrl() {
   }, [session, setPage]);
 
   useEffect(() => {
-    if (page.id === PageId.Loading)
+    if (page.id === PageId.Loading) {
       session.loadTokenFromLocalStorage();
+
+      if (page.redirectUrl && session.sessionType === 'Session') {
+        if (page.redirectUrl.startsWith('/'))
+          window.location.replace(page.redirectUrl);
+        else
+          alert('invalid redirect url');
+      }
+    }
   }, [page, session]);
 
   return page.id === PageId.Loading ? <main>...</main> : null;

@@ -36,17 +36,8 @@ export default function AuthPage() {
       session.auth({ token: base64EncodedToken })
     );
 
-    if (!res.ok) {
+    if (!res.ok)
       alert(res.error.message);
-    } else if (
-      page.id === PageId.Auth /* type assertion */ &&
-      page.redirectUrl) {
-        if (page.redirectUrl.startsWith('/')) {
-          return window.location.replace(page.redirectUrl);
-        } else {
-          alert('invalid redirect URL');
-        }
-    }
 
     setPage(PageId.Loading);
   };
