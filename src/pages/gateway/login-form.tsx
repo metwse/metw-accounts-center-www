@@ -1,11 +1,15 @@
 import { useRef } from 'react';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
+import usePage from '../../hooks/page';
+
+import { PageId } from '..';
 
 
 export default function LoginForm() {
   const session = useSession();
   const loading = useLoading();
+  const [page, _] = usePage();
 
   const ref = useRef(null);
 
@@ -22,8 +26,19 @@ export default function LoginForm() {
 
     const res = await loading(() => promise);
 
-    if (!res.ok)
+    if (!res.ok) {
       alert(res.error.message);
+    } else {
+      if (session.sessionType === 'Session' &&
+          page.id === PageId.Login /* type assertion */ &&
+          page.redirectUrl) {
+        if (page.redirectUrl.startsWith('/')) {
+          window.location.replace(page.redirectUrl);
+        } else {
+          alert('invalid redirect URL');
+        }
+      }
+    }
   };
 
 
@@ -32,7 +47,7 @@ export default function LoginForm() {
       onSubmit={(e) => { e.preventDefault(); login(); }}
       ref={ref}
       >
-      <span>username/email</span>
+      <span>username<br />or email</span>
       <input name="data-identifier" placeholder="username or email" />
       <span>password</span>
       <input name="data-password" type="password" placeholder="password" />

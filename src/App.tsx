@@ -13,7 +13,7 @@ import SyncUrl from './pages/sync-url';
 
 
 export default function App() {
-  const [page, _] = usePage();
+  const [page, setPage] = usePage();
 
   return (
     <>
@@ -27,6 +27,14 @@ export default function App() {
         <GatewayPage /> : null }
       { page.id === PageId.Auth ?
         <AuthPage /> : null }
+
+      { page.id === PageId.NotFound ?
+        <main>
+          Not Found
+          <div>
+            <button onClick={() => setPage(PageId.Loading)}>return</button>
+          </div>
+        </main> : null}
 
       <SyncUrl />
     </>

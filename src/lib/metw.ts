@@ -23,6 +23,31 @@ export function decodeToken(base64EncodedToken: string):
   }
 }
 
+/* returns true if the username is valid */
+export function checkUsernameFormat(username: string): string | true
+{
+  if (username.match("^[0-9]"))
+    return 'usernames cannot start with a digit';
+
+  if (username.match("[._]{2}"))
+    return 'usernames cannot contain two consecutive . and _ characters';
+
+  if (username.match("[._]$"))
+    return 'usernames cannot end with a . or _ character';
+
+  if (username.match("[A-Z]"))
+    return 'usernames do not allow uppercase letters';
+
+  if (username.length < 2)
+    return 'usernames should at least be 2 characters';
+
+  if (username.match("[^a-z0-9._]"))
+    return 'usernames can only contain lowercase letters, digits, or . and _ '
+         + 'characters.';
+
+  return true;
+}
+
 /**
  * Event types / emitted struct
  * - login_emailverificationsession: { }
@@ -30,15 +55,15 @@ export function decodeToken(base64EncodedToken: string):
  * - logout: { }
  */
 export class Session extends EventTarget {
-  isLoggedIn: boolean;
   token: string;
   accountId: string;
+  sessionType: 'None' | 'Session' | 'EmailVerificationSession';
 
   constructor() {
     super();
 
     /* for type hints */
-    this.isLoggedIn = false;
+    this.sessionType = 'None';
     this.token = '';
     this.accountId = '';
   }
@@ -55,7 +80,7 @@ export class Session extends EventTarget {
   }
 
   #removeToken() {
-    this.isLoggedIn = false;
+    this.sessionType = 'None';
     this.token = '';
     this.accountId = '';
 
@@ -72,7 +97,6 @@ export class Session extends EventTarget {
     if (!decodedToken)
       return false;
 
-    this.isLoggedIn = true;
     this.token = newToken;
 
     window.localStorage.setItem('token', newToken);
@@ -80,15 +104,19 @@ export class Session extends EventTarget {
     this.accountId = decodedToken.id;
 
     if (decodedToken.scope == 'EmailVerificationSession') {
+      this.sessionType = 'EmailVerificationSession';
+
       this.dispatchEvent(
         new CustomEvent('login_emailverificationsession', {})
       );
-    }
+    } else if (decodedToken.scope == 'Session') {
+      this.sessionType = 'Session';
 
-    if (decodedToken.scope == 'Session') {
       this.dispatchEvent(
         new CustomEvent('login_session', {})
       );
+    } else {
+      throw new Error('unknown session token');
     }
 
     return true;
@@ -132,6 +160,10 @@ export class Session extends EventTarget {
       return { ok: true, data: res };
     else
       return { ok: false, error: res };
+  }
+
+  get isLoggedIn() {
+    return this.sessionType !== 'None';
   }
 
   /* AUTHENTICATION */
