@@ -2,11 +2,15 @@ import { useRef } from 'react';
 import useCaptcha from '../../hooks/captcha';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
+import usePage from '../../hooks/page';
+
+import { PageId } from '..';
 
 
 export default function ResendVerificationEmailForm() {
   const session = useSession();
   const loading = useLoading();
+  const [page, _] = usePage();
 
   const ref = useRef(null);
 
@@ -19,8 +23,12 @@ export default function ResendVerificationEmailForm() {
 
     const email: string = form['data-email'].value!;
 
+    let redirectUrl: string | undefined;
+    if (page.id === PageId.EmailVerificationSession /* type assertion */)
+      redirectUrl = page.redirectUrl;
+
     const promise = (async () =>
-      await session.retrySignup({ email, captcha })
+      await session.retrySignup({ email, captcha, redirect_url: redirectUrl })
     )();
 
     const res = await loading(() => promise);

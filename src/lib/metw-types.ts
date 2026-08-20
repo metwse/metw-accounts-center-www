@@ -16,6 +16,7 @@ export type SignupReq = {
   readonly username: string,
   readonly email: string,
   readonly password: string,
+  readonly redirect_url?: string,
 
   readonly captcha: string
 };
@@ -41,6 +42,13 @@ export type KdfRes =
         readonly algorithm: 'legacy_sha256_hex',
       }
   };
+
+export type RetrySignupReq = {
+  readonly email: string,
+  readonly redirect_url?: string,
+
+  readonly captcha: string
+};
 
 export type EmailAndCaptchaReq = {
   readonly email: string,

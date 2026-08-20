@@ -2,7 +2,8 @@ import { legacySha256Hex, base64EncodedPbkdf2Sha256 } from './crypto';
 import type {
   ApiActionResult, ApiResult, AccountRes, EmailAndCaptchaReq, EmailReq,
   LoginReq, SignupReq, TokenReq, TokenRes,
-  KdfRes
+  KdfRes,
+  RetrySignupReq
 } from './metw-types';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '/api';
@@ -168,7 +169,7 @@ export class Session extends EventTarget {
 
   /* AUTHENTICATION */
   async signup(
-    { username, email, password, captcha }: SignupReq
+    { username, email, password, redirect_url, captcha }: SignupReq
   ): Promise<ApiResult<TokenRes>> {
     const passwordHash = await base64EncodedPbkdf2Sha256(password, PBKDF2_PARAMETERS);
 
@@ -185,6 +186,7 @@ export class Session extends EventTarget {
             pbkdf2_iterations: PBKDF2_PARAMETERS.iterations,
             pbkdf2_length: PBKDF2_PARAMETERS.length
           },
+          redirect_url
         },
         query: { captcha }
       }
@@ -261,13 +263,13 @@ export class Session extends EventTarget {
 
   /* EMAIL VERIFICATION SESSION */
   async retrySignup(
-    { email, captcha }: EmailAndCaptchaReq
+    { email, captcha, redirect_url }: RetrySignupReq
   ): Promise<ApiActionResult> {
     return await this.#request(
       '/signup/retry',
       {
         method: 'POST',
-        body: { email },
+        body: { email, redirect_url },
         query: { captcha }
       }
     );

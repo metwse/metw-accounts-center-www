@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { PageContext } from '.';
-import { decodeLocationToPage, encodePageToURL, PageId, type Page } from '../../pages';
+import { decodeLocationToPage, encodePageToURL, PageId, pageWithRedirectUrl, type Page } from '../../pages';
 
 
 export default function PageProvider(
@@ -18,10 +18,9 @@ export default function PageProvider(
       const id = newPage.id;
 
       setPage((prev) => {
-        if ((prev.id === PageId.Login || prev.id === PageId.Signup) &&
-            (id === PageId.Login || id === PageId.Signup)) {
-          newPage = { id, redirectUrl: prev.redirectUrl };
-        }
+        if ('redirectUrl' in prev && prev.redirectUrl &&
+            pageWithRedirectUrl.includes(newPage.id))
+          newPage = { ...newPage, redirectUrl: prev.redirectUrl } as Page;
 
         if (pushstate)
           history.pushState(null, '', encodePageToURL(newPage));

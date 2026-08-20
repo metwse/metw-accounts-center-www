@@ -2,13 +2,17 @@ import { useRef, useState } from 'react';
 import useCaptcha from '../../hooks/captcha';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
+import usePage from '../../hooks/page';
 
 import { checkUsernameFormat } from '../../lib/metw';
+
+import { PageId } from '..';
 
 
 export default function SignupForm() {
   const session = useSession();
   const loading = useLoading();
+  const [page, _] = usePage();
 
   const formRef = useRef(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -36,9 +40,13 @@ export default function SignupForm() {
 
     const captcha = await executeCaptcha();
 
+    let redirectUrl: string | undefined;
+    if (page.id === PageId.Signup /* type assertion */)
+      redirectUrl = page.redirectUrl;
+
     const promise = (async () =>
       await session.signup({
-        username, email, password, captcha,
+        username, email, password, captcha, redirect_url: redirectUrl
       })
     )();
 

@@ -12,7 +12,7 @@ import styles from './style.module.scss';
 export default function AuthPage() {
   const session = useSession();
   const loading = useLoading();
-  const [page, _] = usePage();
+  const [page, setPage] = usePage();
 
   if (page.id !== PageId.Auth)
     return <main>Must use AuthPage whitin page.id == PageId.Auth</main>;
@@ -36,8 +36,19 @@ export default function AuthPage() {
       session.auth({ token: base64EncodedToken })
     );
 
-    if (!res.ok)
+    if (!res.ok) {
       alert(res.error.message);
+    } else if (
+      page.id === PageId.Auth /* type assertion */ &&
+      page.redirectUrl) {
+        if (page.redirectUrl.startsWith('/')) {
+          return window.location.replace(page.redirectUrl);
+        } else {
+          alert('invalid redirect URL');
+        }
+    }
+
+    setPage(PageId.Loading);
   };
 
   return (

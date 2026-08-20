@@ -7,11 +7,31 @@ export enum PageId {
 };
 
 export type Page =
-    { readonly id: PageId.EmailVerificationSession | PageId.Session, }
-  | { readonly id: PageId.Auth, readonly token?: string, }
-  | { readonly id: PageId.Login | PageId.Signup, readonly redirectUrl?: string }
-  | { readonly id: PageId.NotFound, }
-  | { readonly id: PageId.Loading, };
+    {
+      readonly id: PageId.Session,
+    }
+  | {
+      readonly id: PageId.Auth,
+      readonly token?: string,
+      readonly redirectUrl?: string,
+    }
+  | {
+      readonly id:
+        PageId.Login | PageId.Signup | PageId.EmailVerificationSession | PageId.Loading,
+      readonly redirectUrl?: string
+    }
+  | {
+      readonly id: PageId.NotFound,
+    }
+
+export const pageWithRedirectUrl = [
+  PageId.Auth,
+  PageId.Login, PageId.Signup,
+  PageId.EmailVerificationSession, PageId.Loading
+];
+
+export const pageWithToken = [PageId.Auth];
+
 
 
 const endpointMap: Record<PageId, string> = {
@@ -31,10 +51,10 @@ const endpointRevMap: Record<string, PageId> = {
 export function encodePageToURL(page: Page): string {
   const searchParams = new URLSearchParams();
 
-  if ((page.id === PageId.Login || page.id === PageId.Signup) && page.redirectUrl)
-    searchParams.set('redirect_url', page.redirectUrl );
+  if ('redirectUrl' in page && page.redirectUrl)
+    searchParams.set('redirect_url', page.redirectUrl);
 
-  if (page.id === PageId.Auth && page.token)
+  if ('token' in page && page.token)
     searchParams.set('auth', page.token);
 
   const path: string = endpointMap[page.id];
@@ -49,15 +69,14 @@ export function encodePageToURL(page: Page): string {
 export function decodeLocationToPage(): Page {
   const searchParams = new URLSearchParams(window.location.search);
   const id = endpointRevMap[window.location.pathname] || PageId.NotFound;
-  let page: Page;
 
-  if ((id === PageId.Login || id === PageId.Signup) &&
-      searchParams.has('redirect_url'))
-    page = { id, redirectUrl: searchParams.get('redirect_url')! };
-  else if (id == PageId.Auth || searchParams.has('auth'))
-    page = { id, token: searchParams.get('auth')! };
-  else
-    page = { id };
+  let redirectUrl: string | undefined;
+  let token: string | undefined;
 
-  return page;
+  if (pageWithRedirectUrl.includes(id))
+    redirectUrl = searchParams.get('redirect_url') || undefined;
+  if (pageWithToken.includes(id))
+    token = searchParams.get('auth') || undefined;
+
+  return { id, token, redirectUrl };
 }
