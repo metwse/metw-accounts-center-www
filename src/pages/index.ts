@@ -24,6 +24,17 @@ export type Page =
       readonly id: PageId.NotFound,
     }
 
+type PageWithRedirectUrl = Extract<Page, { redirectUrl?: string }>
+type PageWithToken = Extract<Page, { token?: string }>
+
+export function supportsRedirect(page: Page): page is PageWithRedirectUrl {
+  return 'redirectUrl' in page;
+}
+
+export function supportsToken(page: Page): page is PageWithToken {
+  return 'token' in page;
+}
+
 export const pageWithRedirectUrl = [
   PageId.Auth,
   PageId.Login, PageId.Signup,
@@ -48,13 +59,13 @@ const endpointRevMap: Record<string, PageId> = {
   ['/']: PageId.Loading,
 };
 
-export function encodePageToURL(page: Page): string {
+export function pageToLocation(page: Page): string {
   const searchParams = new URLSearchParams();
 
-  if ('redirectUrl' in page && page.redirectUrl)
+  if (supportsRedirect(page) && page.redirectUrl)
     searchParams.set('redirect_url', page.redirectUrl);
 
-  if ('token' in page && page.token)
+  if (supportsToken(page) && page.token)
     searchParams.set('auth', page.token);
 
   const path: string = endpointMap[page.id];
@@ -66,7 +77,7 @@ export function encodePageToURL(page: Page): string {
     return path;
 }
 
-export function decodeLocationToPage(): Page {
+export function pageFromLocation(): Page {
   const searchParams = new URLSearchParams(window.location.search);
   const id = endpointRevMap[window.location.pathname] || PageId.NotFound;
 
@@ -79,4 +90,15 @@ export function decodeLocationToPage(): Page {
     token = searchParams.get('auth') || undefined;
 
   return { id, token, redirectUrl };
+}
+
+export function performRedirect(redirectUrl?: string): boolean {
+  if (!redirectUrl)
+    return false;
+
+  if (!redirectUrl.startsWith('/'))
+    throw new Error('Invalid rediret URL');
+
+  window.location.replace(redirectUrl);
+  return true;
 }

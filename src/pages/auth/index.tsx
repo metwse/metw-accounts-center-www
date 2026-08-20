@@ -12,7 +12,7 @@ import styles from './style.module.scss';
 export default function AuthPage() {
   const session = useSession();
   const loading = useLoading();
-  const [page, setPage] = usePage();
+  const { page, navigate } = usePage();
 
   if (page.id !== PageId.Auth)
     return <main>Must use AuthPage whitin page.id == PageId.Auth</main>;
@@ -39,7 +39,7 @@ export default function AuthPage() {
     if (!res.ok)
       alert(res.error.message);
 
-    setPage(PageId.Loading);
+    navigate(PageId.Loading);
   };
 
   return (

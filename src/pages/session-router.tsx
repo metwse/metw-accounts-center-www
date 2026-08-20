@@ -2,23 +2,23 @@ import { useEffect } from 'react';
 import useSession from '../hooks/session';
 import usePage from '../hooks/page';
 
-import { PageId } from '.';
+import { PageId, performRedirect } from '.';
 
 
-export default function SyncUrl() {
+export default function SessionRouter() {
   const session = useSession();
 
-  const [page, setPage] = usePage();
+  const { page, navigate } = usePage();
 
   useEffect(() => {
     const emailverificationsessionHandler =
-      () => setPage(PageId.EmailVerificationSession);
+      () => navigate(PageId.EmailVerificationSession);
 
     const sessionHandler = () => {
-      setPage(PageId.Session);
+      navigate(PageId.Session);
     };
 
-    const logoutHandler = () => setPage(PageId.Login);
+    const logoutHandler = () => navigate(PageId.Login);
 
     session.addEventListener(
       'login_emailverificationsession', emailverificationsessionHandler
@@ -37,20 +37,21 @@ export default function SyncUrl() {
 
       session.removeEventListener('logout', logoutHandler);
     };
-  }, [session, setPage]);
+  }, [session, navigate]);
 
   useEffect(() => {
     if (page.id === PageId.Loading) {
       session.loadTokenFromLocalStorage();
 
       if (page.redirectUrl && session.sessionType === 'Session') {
-        if (page.redirectUrl.startsWith('/'))
-          window.location.replace(page.redirectUrl);
-        else
-          alert('invalid redirect url');
+        try {
+          performRedirect(page.redirectUrl);
+        } catch (err) {
+          alert(err);
+        }
       }
     }
   }, [page, session]);
 
-  return page.id === PageId.Loading ? <main>...</main> : null;
+  return null;
 }

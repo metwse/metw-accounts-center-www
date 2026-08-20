@@ -11,7 +11,7 @@ import { AFunction } from '../../components/a-function';
 
 
 export default function GatewayPage() {
-  const [page, setPage] = usePage();
+  const { page, navigate } = usePage();
 
   return (
     <main className={styles['main']}>
@@ -30,7 +30,7 @@ export default function GatewayPage() {
 
         <div>
           don't have an account?&nbsp;
-          <AFunction onClick={() => setPage(PageId.Signup)} href="/login">create one</AFunction>
+          <AFunction onClick={() => navigate(PageId.Signup)} href="/login">create one</AFunction>
         </div>
         </> : null }
 
@@ -46,7 +46,7 @@ export default function GatewayPage() {
 
         <div>
           already have an account?&nbsp;
-          <AFunction onClick={() => setPage(PageId.Login)}>login</AFunction>
+          <AFunction onClick={() => navigate(PageId.Login)}>login</AFunction>
         </div>
         </> : null }
     </main>

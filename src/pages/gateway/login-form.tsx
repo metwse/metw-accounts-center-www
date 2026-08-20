@@ -3,13 +3,13 @@ import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
 import usePage from '../../hooks/page';
 
-import { PageId } from '..';
+import { PageId, performRedirect } from '..';
 
 
 export default function LoginForm() {
   const session = useSession();
   const loading = useLoading();
-  const [page, _] = usePage();
+  const { page } = usePage();
 
   const ref = useRef(null);
 
@@ -30,12 +30,11 @@ export default function LoginForm() {
       alert(res.error.message);
     } else {
       if (session.sessionType === 'Session' &&
-          page.id === PageId.Login /* type assertion */ &&
-          page.redirectUrl) {
-        if (page.redirectUrl.startsWith('/')) {
-          window.location.replace(page.redirectUrl);
-        } else {
-          alert('invalid redirect URL');
+          page.id === PageId.Login /* type assertion */) {
+        try {
+          performRedirect(page.redirectUrl);
+        } catch (err) {
+          alert(err);
         }
       }
     }

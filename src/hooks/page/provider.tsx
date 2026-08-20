@@ -1,66 +1,57 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 
 import { PageContext } from '.';
-import { decodeLocationToPage, encodePageToURL, PageId, pageWithRedirectUrl, type Page } from '../../pages';
+import {
+  pageFromLocation, pageToLocation, PageId,
+  pageWithRedirectUrl, type Page,
+  supportsRedirect
+} from '../../pages';
 
+
+function resolveDestionation(currentPage: Page, destination: Page | PageId): Page {
+  const nextPage: Page = typeof destination === 'object' ?
+    destination : { id: destination };
+
+  if (
+    supportsRedirect(currentPage) &&
+    pageWithRedirectUrl.includes(nextPage.id) &&
+    currentPage.redirectUrl
+  ) {
+    return { ...nextPage, redirectUrl: currentPage.redirectUrl } as Page;
+  }
+
+  return nextPage;
+}
 
 export default function PageProvider(
   { children }: { children: ReactNode | ReactNode[] }
 ) {
 
-  const [page, setPage] = useState<Page>(decodeLocationToPage());
+  const [page, setPage] = useState<Page>(pageFromLocation());
 
-  const setPageOverride = useMemo(
-    () => (newPageOrId: Page | PageId, pushstate: boolean) => {
-      let newPage: Page = (typeof newPageOrId === 'object') ?
-        newPageOrId : { id: newPageOrId };
+  const navigate = useCallback(
+    (destination: Page | PageId) => {
+      const nextPage = resolveDestionation(page, destination);
+      const nextUrl = pageToLocation(nextPage);
 
-      const id = newPage.id;
-
-      setPage((prev) => {
-        if ('redirectUrl' in prev && prev.redirectUrl &&
-            pageWithRedirectUrl.includes(newPage.id))
-          newPage = { ...newPage, redirectUrl: prev.redirectUrl } as Page;
-
-        if (pushstate)
-          history.pushState(null, '', encodePageToURL(newPage));
-
-        return newPage;
-      });
-
-      let title = null;
-
-      switch (id) {
-        case PageId.EmailVerificationSession:
-          title = 'Pending Email Verification';
-          break;
-
-        case PageId.Session:
-          title = 'Your Account';
-          break;
-      }
-
-      document.title = title === null ?
-        'Accounts Center' : `${title} | Accounts Center`;
-    },
-    [setPage]
+      window.history.pushState(null, '', nextUrl);
+      setPage(nextPage);
+    }, [page]
   );
 
   useEffect(() => {
-    const popstatehandler = () => {
-      setPageOverride(decodeLocationToPage(), false);
-    };
+    const handlePopState = () => setPage(pageFromLocation());
 
-    window.addEventListener('popstate', popstatehandler);
+    window.addEventListener('popstate', handlePopState);
 
     return () => {
-      window.removeEventListener('popstate', popstatehandler);
+      window.removeEventListener('popstate', handlePopState);
     };
-  }, [setPageOverride]);
+  }, []);
 
   return (
     <PageContext
-      value={[page, (p) => setPageOverride(p, true)]}
+      value={{ page, navigate }}
       >
       {children}
     </PageContext>

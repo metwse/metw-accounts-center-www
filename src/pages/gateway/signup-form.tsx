@@ -12,7 +12,7 @@ import { PageId } from '..';
 export default function SignupForm() {
   const session = useSession();
   const loading = useLoading();
-  const [page, _] = usePage();
+  const { page } = usePage();
 
   const formRef = useRef(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);

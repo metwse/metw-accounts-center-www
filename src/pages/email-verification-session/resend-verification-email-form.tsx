@@ -10,7 +10,7 @@ import { PageId } from '..';
 export default function ResendVerificationEmailForm() {
   const session = useSession();
   const loading = useLoading();
-  const [page, _] = usePage();
+  const { page } = usePage();
 
   const ref = useRef(null);
 
