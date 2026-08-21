@@ -22,7 +22,7 @@ const PBKDF2_PARAMETERS = {
 };
 
 export function decodeToken(base64EncodedToken: string):
-  { id: string, scope: string } | null
+  { sub: string, scope: string } | null
 {
   try {
     return JSON.parse(atob(base64EncodedToken.split('.')[1]));
@@ -109,7 +109,7 @@ export class Session extends EventTarget {
 
     window.localStorage.setItem('token', newToken);
 
-    this.accountId = decodedToken.id;
+    this.accountId = decodedToken.sub;
 
     if (decodedToken.scope == 'EmailVerificationSession') {
       this.sessionType = 'EmailVerificationSession';
