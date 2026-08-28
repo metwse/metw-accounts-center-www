@@ -1,5 +1,5 @@
 export enum PageId {
-  EmailVerificationSession, Session, /* not directly accesible */
+  EmailVerificationSession, Session, /* not directly accessible */
   Login, Signup, /* /login and /signup endpoints */
   Auth, /* /auth */
   Developers, /* /developers */
@@ -62,12 +62,14 @@ const endpointMap: Record<PageId, string> = {
   [PageId.Loading]: '/',
 };
 
-const titleMap: Record<PageId, string | undefined> = {
+const titleMap: Record<PageId, string | null> = {
   [PageId.Session]: 'Your Account',
   [PageId.EmailVerificationSession]: 'Pending Email Verification',
-  [PageId.Auth]: 'Authorize Acction',
+  [PageId.Login]: null, [PageId.Signup]: null,
+  [PageId.Auth]: 'Authorize Action',
   [PageId.Developers]: 'Developers',
   [PageId.NotFound]: '404!',
+  [PageId.Loading]: null,
 };
 
 const endpointRevMap: Record<string, PageId> = {

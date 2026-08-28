@@ -31,7 +31,7 @@ export function decodeToken(base64EncodedToken: string):
   }
 }
 
-/* returns true if the username is valid */
+/* Returns true if the username is valid. */
 export function checkUsernameFormat(username: string): string | true
 {
   if (username.match("^[0-9]"))
@@ -88,12 +88,23 @@ export class Session extends EventTarget {
     }
   }
 
+  /**
+   * Soft-resets the in-memory authentication state while preserving the
+   * persisted token. Subscribers are notified, but NotInitialized does not
+   * trigger navigation.
+   */
   uninitialize() {
     this.authenticationState = AuthenticationState.NotInitialized;
     this.#token = null;
     this.accountId = null;
+
+    this.dispatchEvent(new CustomEvent('authenticationState', {}));
   }
 
+  /**
+   * Clears both the in-memory authentication state and the persisted token.
+   * Subscribers respond to Unauthenticated by navigating to the login page.
+   */
   #removeToken() {
     this.authenticationState = AuthenticationState.Unauthenticated;
     this.#token = null;
@@ -101,9 +112,7 @@ export class Session extends EventTarget {
 
     window.localStorage.removeItem('token');
 
-    this.dispatchEvent(
-      new CustomEvent('authenticationState', {})
-    );
+    this.dispatchEvent(new CustomEvent('authenticationState', {}));
   }
 
   #updateToken(newToken: string): boolean {
@@ -112,23 +121,28 @@ export class Session extends EventTarget {
     if (!decodedToken)
       return false;
 
-    this.#token = newToken;
+    let authenticationState: AuthenticationState;
 
-    window.localStorage.setItem('token', newToken);
+    switch (decodedToken.scope) {
+      case 'EmailVerificationSession':
+        authenticationState = AuthenticationState.EmailVerificationSession;
+        break;
 
-    this.accountId = decodedToken.sub;
+      case 'Session':
+        authenticationState = AuthenticationState.Session;
+        break;
 
-    if (decodedToken.scope == 'EmailVerificationSession') {
-      this.authenticationState = AuthenticationState.EmailVerificationSession;
-
-      this.dispatchEvent(new CustomEvent('authenticationState', {}));
-    } else if (decodedToken.scope == 'Session') {
-      this.authenticationState = AuthenticationState.Session;
-
-      this.dispatchEvent(new CustomEvent('authenticationState', {}));
-    } else {
-      throw new Error('unknown session token');
+      default:
+        return false;
     }
+
+    localStorage.setItem('token', newToken);
+
+    this.#token = newToken;
+    this.accountId = decodedToken.sub;
+    this.authenticationState = authenticationState;
+
+    this.dispatchEvent(new CustomEvent('authenticationState', {}));
 
     return true;
   }

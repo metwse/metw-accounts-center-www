@@ -1,15 +1,11 @@
 import { useRef } from 'react';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
-import usePage from '../../hooks/page';
-
-import { PageId, performRedirect } from '..';
 
 
 export default function LoginForm() {
   const session = useSession();
   const loading = useLoading();
-  const { page } = usePage();
 
   const ref = useRef(null);
 
@@ -30,18 +26,8 @@ export default function LoginForm() {
 
     const res = await loading(() => promise);
 
-    if (!res.ok) {
+    if (!res.ok)
       alert(res.error.message);
-    } else {
-      if (session.sessionType === 'Session' &&
-          page.id === PageId.Login /* type assertion */) {
-        try {
-          performRedirect(page.redirectUrl);
-        } catch (err) {
-          alert(err);
-        }
-      }
-    }
   };
 
 
