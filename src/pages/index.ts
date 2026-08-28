@@ -2,7 +2,7 @@ export enum PageId {
   EmailVerificationSession, Session, /* not directly accessible */
   Login, Signup, /* /login and /signup endpoints */
   Auth, /* /auth */
-  Developers, /* /developers */
+  Developers, DevelopersApps, /* /developers and /developers/apps */
   NotFound,
   Loading, /* loading for account login */
 };
@@ -30,11 +30,16 @@ export type Page =
       readonly id: PageId.Developers,
     }
   | {
+      readonly id: PageId.DevelopersApps,
+      readonly appId?: string,
+    }
+  | {
       readonly id: PageId.NotFound,
     }
 
 type PageWithRedirectUrl = Extract<Page, { redirectUrl?: string }>
 type PageWithToken = Extract<Page, { token?: string }>
+type PageWithAppId = Extract<Page, { appId?: string }>
 
 export function supportsRedirect(page: Page): page is PageWithRedirectUrl {
   return 'redirectUrl' in page;
@@ -42,6 +47,10 @@ export function supportsRedirect(page: Page): page is PageWithRedirectUrl {
 
 export function supportsToken(page: Page): page is PageWithToken {
   return 'token' in page;
+}
+
+export function supportsAppId(page: Page): page is PageWithAppId {
+  return 'appId' in page;
 }
 
 export const pageWithRedirectUrl = [
@@ -52,12 +61,15 @@ export const pageWithRedirectUrl = [
 
 export const pageWithToken = [PageId.Auth];
 
+export const pageWithAppId = [PageId.DevelopersApps];
+
 
 const endpointMap: Record<PageId, string> = {
   [PageId.Session]: '/', [PageId.EmailVerificationSession]: '/',
   [PageId.Login]: '/login', [PageId.Signup]: '/signup',
   [PageId.Auth]: '/auth',
   [PageId.Developers]: '/developers',
+  [PageId.DevelopersApps]: '/developers/apps',
   [PageId.NotFound]: '/404',
   [PageId.Loading]: '/',
 };
@@ -68,6 +80,7 @@ const titleMap: Record<PageId, string | null> = {
   [PageId.Login]: null, [PageId.Signup]: null,
   [PageId.Auth]: 'Authorize Action',
   [PageId.Developers]: 'Developers',
+  [PageId.DevelopersApps]: 'Developers',
   [PageId.NotFound]: '404!',
   [PageId.Loading]: null,
 };
@@ -76,6 +89,7 @@ const endpointRevMap: Record<string, PageId> = {
   ['/login']: PageId.Login, ['/signup']: PageId.Signup,
   ['/auth']: PageId.Auth,
   ['/developers']: PageId.Developers,
+  ['/developers/apps']: PageId.DevelopersApps,
   ['/']: PageId.Loading,
 };
 
@@ -87,6 +101,9 @@ export function pageToLocation(page: Page): string {
 
   if (supportsToken(page) && page.token)
     searchParams.set('auth', page.token);
+
+  if (supportsAppId(page) && page.appId)
+    searchParams.set('app_id', page.appId);
 
   const path: string = endpointMap[page.id];
   const searchParamsString = searchParams.toString();
@@ -109,13 +126,16 @@ export function pageFromLocation(): Page {
 
   let redirectUrl: string | undefined;
   let token: string | undefined;
+  let appId: string | undefined;
 
   if (pageWithRedirectUrl.includes(id))
     redirectUrl = searchParams.get('redirect_url') || undefined;
   if (pageWithToken.includes(id))
     token = searchParams.get('auth') || undefined;
+  if (pageWithAppId.includes(id))
+    appId = searchParams.get('app_id') || undefined;
 
-  return { id, token, redirectUrl };
+  return { id, token, redirectUrl, appId };
 }
 
 export function performRedirect(redirectUrl?: string): void {

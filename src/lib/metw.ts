@@ -3,7 +3,10 @@ import type {
   AccountResponse,
   AddEmailRequest,
   ApiActionResult, ApiResult,
+  AppInfoResponse,
   AuthRequest,
+  BasicAppInfoResponse,
+  CreateAppRequest,
   DeleteEmailRequest,
   KdfResponse,
   LoginRequest,
@@ -413,6 +416,23 @@ export class Session extends EventTarget {
             pbkdf2_length: PBKDF2_PARAMETERS.length
           }
         },
+      }
+    );
+  }
+
+  async apps(): Promise<ApiResult<BasicAppInfoResponse[]>> {
+    return await this.#request('/me/apps', {});
+  }
+
+  async createApp(
+    { name, captcha }: CreateAppRequest
+  ): Promise<ApiResult<AppInfoResponse>> {
+    return await this.#request(
+      '/me/apps',
+      {
+        method: 'POST',
+        body: { name },
+        query: { captcha }
       }
     );
   }

@@ -52,6 +52,11 @@ export type AuthRequest = {
   readonly token: string
 };
 
+export type CreateAppRequest = {
+  readonly name: string,
+  readonly captcha: string
+}
+
 
 /* RESPONSE TYPES */
 export type TokenResponse = {
@@ -63,6 +68,17 @@ export type AccountResponse = {
   readonly email?: string,
   readonly secondary_emails: string[],
   readonly username_aliasses: string[],
+}
+
+export type BasicAppInfoResponse = {
+  readonly app_id: string,
+  readonly name: string,
+}
+
+export type AppInfoResponse = {
+  readonly app_id: string,
+  readonly client_secret: string,
+  readonly name: string,
 }
 
 export type KdfResponse =

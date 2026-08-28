@@ -1,38 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 import useSession from '../../hooks/session';
 import usePage from '../../hooks/page';
 
 import { PageId } from '..';
+
+import DevelopersHomepage from './homepage';
+
 import { AuthenticationState } from '../../lib/metw';
-
-import CaptchaProvider from '../../hooks/captcha/provider';
-
-import styles from './style.module.scss';
-import { AppLink } from '../../components/app-link';
 
 
 export default function DevelopersPage() {
   const session = useSession();
-  const { navigate } = usePage();
+  const { page, navigate } = usePage();
+
+  const onUnauthenticated = useEffectEvent(() =>
+    navigate({ id: PageId.Loading, redirectPage: page }, false)
+  );
 
   useEffect(() => {
-    if (session.authenticationState != AuthenticationState.Session)
-      navigate({ id: PageId.Loading, redirectPage: PageId.Developers }, false);
+    if (session.authenticationState !== AuthenticationState.Session)
+      onUnauthenticated();
   }, [session, navigate]);
 
-  return (
-    <main className={styles['main']}>
-      <section>
-        <h3>Registered applications</h3>
+  switch (page.id) {
+    case PageId.Developers:
+      return <DevelopersHomepage />;
 
-        <CaptchaProvider>
-          under construction
-        </CaptchaProvider>
-      </section>
-
-      <AppLink onClick={() => navigate(PageId.Session)} href="/">
-        return to the homepage
-      </AppLink>
-    </main>
-  );
+    case PageId.DevelopersApps:
+      return <main>under construction</main>;
+  }
 }

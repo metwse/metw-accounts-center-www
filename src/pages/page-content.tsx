@@ -27,6 +27,7 @@ export default function PageContent() {
       return <AuthPage />;
 
     case PageId.Developers:
+    case PageId.DevelopersApps:
       return <DevelopersPage />;
 
     case PageId.NotFound:
