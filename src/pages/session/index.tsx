@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import useSession from '../../hooks/session';
 import useLoading from '../../hooks/loading-overlay';
+import usePage from '../../hooks/page';
+
+import { PageId } from '..';
 
 import CaptchaProvider from '../../hooks/captcha/provider';
 
@@ -10,11 +13,13 @@ import EmailList from './email-list';
 import AddEmailForm from './add-email-form';
 
 import styles from './style.module.scss';
+import { AppLink } from '../../components/app-link';
 
 
 export default function SessionPage() {
   const session = useSession();
   const loading = useLoading();
+  const { navigate } = usePage();
 
   const [me, setMe] = useState<null | AccountResponse>(null);
 
@@ -87,12 +92,6 @@ export default function SessionPage() {
           <button onClick={
             () => { loading(() => session.logout()); }
           }>logout</button>
-
-          <button
-            onClick={() => open(`/accounts-center-migration/authenticate?${session.token}`)}
-            >
-              log into metw.cc
-          </button>
         </div>
       </section>
 
@@ -125,6 +124,17 @@ export default function SessionPage() {
           <input type="submit" value="change" />
         </form>
       </section>
+
+      <div className={styles['developer-info']}>
+        <i>your account ID: {session.accountId}</i> <br/>
+        are you a developer?
+        check out the <AppLink
+          onClick={() => navigate(PageId.Developers)}
+          href="/developers"
+          >
+          developer settings
+        </AppLink>.
+      </div>
     </main>
   );
 }

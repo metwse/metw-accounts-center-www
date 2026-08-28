@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react';
 
 import { PageContext } from '.';
 import {
   pageFromLocation, pageToLocation, PageId,
   pageWithRedirectUrl, type Page,
-  supportsRedirect
+  supportsRedirect,
+  pageToTitle
 } from '../../pages';
 
 
@@ -26,28 +27,41 @@ function resolveDestination(currentPage: Page, destination: Page | PageId): Page
 export default function PageProvider(
   { children }: { children: ReactNode | ReactNode[] }
 ) {
-
   const [page, setPage] = useState<Page>(pageFromLocation);
 
-  const navigate = useCallback(
-    (destination: Page | PageId) => {
-      const nextPage = resolveDestination(page, destination);
-      const nextUrl = pageToLocation(nextPage);
+  const pageRef = useRef(page);
 
-      window.history.pushState(null, '', nextUrl);
-      setPage(nextPage);
-    }, [page]
+  const commitPage = useCallback((nextPage: Page) => {
+    pageRef.current = nextPage;
+    document.title = pageToTitle(nextPage);
+
+    setPage(nextPage);
+  }, []);
+
+  const navigate = useCallback(
+    (destination: Page | PageId, pushState?: boolean) => {
+      const currentPage = pageRef.current;
+
+      const nextPage = resolveDestination(currentPage, destination);
+
+      if (pushState !== false) {
+        const nextUrl = pageToLocation(nextPage);
+        window.history.pushState(null, '', nextUrl);
+      }
+
+      commitPage(nextPage);
+    }, [commitPage]
   );
 
   useEffect(() => {
-    const handlePopState = () => setPage(pageFromLocation());
+    const handlePopState = () => commitPage(pageFromLocation());
 
     window.addEventListener('popstate', handlePopState);
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, []);
+  }, [commitPage]);
 
   return (
     <PageContext

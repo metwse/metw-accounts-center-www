@@ -56,24 +56,25 @@ export function checkUsernameFormat(username: string): string | true
   return true;
 }
 
-/**
- * Event types / emitted struct
- * - login_emailverificationsession: { }
- * - login_session: { }
- * - logout: { }
- */
+export enum AuthenticationState {
+  NotInitialized,
+  Unauthenticated,
+  Session,
+  EmailVerificationSession
+};
+
 export class Session extends EventTarget {
-  token: string;
-  accountId: string;
-  sessionType: 'None' | 'Session' | 'EmailVerificationSession';
+  #token: null | string;
+  accountId: null | string;
+  authenticationState: AuthenticationState;
 
   constructor() {
     super();
 
-    /* for type hints */
-    this.sessionType = 'None';
-    this.token = '';
-    this.accountId = '';
+    /* same as uninitialize */
+    this.authenticationState = AuthenticationState.NotInitialized;
+    this.#token = null;
+    this.accountId = null;
   }
 
   loadTokenFromLocalStorage() {
@@ -87,15 +88,21 @@ export class Session extends EventTarget {
     }
   }
 
+  uninitialize() {
+    this.authenticationState = AuthenticationState.NotInitialized;
+    this.#token = null;
+    this.accountId = null;
+  }
+
   #removeToken() {
-    this.sessionType = 'None';
-    this.token = '';
-    this.accountId = '';
+    this.authenticationState = AuthenticationState.Unauthenticated;
+    this.#token = null;
+    this.accountId = null;
 
     window.localStorage.removeItem('token');
 
     this.dispatchEvent(
-      new CustomEvent('logout', {})
+      new CustomEvent('authenticationState', {})
     );
   }
 
@@ -105,24 +112,20 @@ export class Session extends EventTarget {
     if (!decodedToken)
       return false;
 
-    this.token = newToken;
+    this.#token = newToken;
 
     window.localStorage.setItem('token', newToken);
 
     this.accountId = decodedToken.sub;
 
     if (decodedToken.scope == 'EmailVerificationSession') {
-      this.sessionType = 'EmailVerificationSession';
+      this.authenticationState = AuthenticationState.EmailVerificationSession;
 
-      this.dispatchEvent(
-        new CustomEvent('login_emailverificationsession', {})
-      );
+      this.dispatchEvent(new CustomEvent('authenticationState', {}));
     } else if (decodedToken.scope == 'Session') {
-      this.sessionType = 'Session';
+      this.authenticationState = AuthenticationState.Session;
 
-      this.dispatchEvent(
-        new CustomEvent('login_session', {})
-      );
+      this.dispatchEvent(new CustomEvent('authenticationState', {}));
     } else {
       throw new Error('unknown session token');
     }
@@ -149,7 +152,7 @@ export class Session extends EventTarget {
     }
 
     if (this.isLoggedIn) {
-      headers['Authorization'] = 'Bearer ' + this.token;
+      headers['Authorization'] = 'Bearer ' + this.#token;
     }
 
     path += encodedQuery;
@@ -171,7 +174,7 @@ export class Session extends EventTarget {
   }
 
   get isLoggedIn() {
-    return this.sessionType !== 'None';
+    return !!this.#token;
   }
 
   /* AUTHENTICATION */
@@ -259,7 +262,7 @@ export class Session extends EventTarget {
       '/logout',
       {
         method: 'POST',
-        body: { token: this.token }
+        body: { token: this.#token }
       }
     );
 
@@ -283,7 +286,7 @@ export class Session extends EventTarget {
   }
 
   /* AUTHORIZATION */
-  async auth({ token }: AuthRequest): Promise<ApiActionResult> {
+  async auth({ token }: AuthRequest): Promise<ApiResult<string>> {
     const scope = Object.entries(decodeToken(token)!.scope);
     const scopeName = scope[0][0];
 
@@ -298,7 +301,10 @@ export class Session extends EventTarget {
     if (scopeName === 'CompleteSignup')
       this.#removeToken();
 
-    return res;
+    if (!res.ok)
+      return res;
+    else
+      return { ok: true, data: scopeName };
   }
 
   /* SESSION */

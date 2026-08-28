@@ -36,10 +36,12 @@ export default function AuthPage() {
       session.auth({ token: base64EncodedToken })
     );
 
-    if (!res.ok)
+    if (!res.ok) {
       alert(res.error.message);
-
-    navigate(PageId.Loading);
+      navigate(PageId.Loading);
+    } else if (res.data !== 'CompleteSignup') {
+      navigate(PageId.Loading);
+    }
   };
 
   return (

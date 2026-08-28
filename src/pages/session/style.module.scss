@@ -41,6 +41,10 @@
   flex-wrap: wrap; gap: 0.25rem 0.5rem;
 }
 
+.developer-info {
+  i { opacity: 0.75; }
+}
+
 @media (max-width: 24rem) {
   .main form {
     flex-direction: column;

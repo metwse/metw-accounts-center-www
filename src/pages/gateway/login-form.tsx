@@ -19,6 +19,10 @@ export default function LoginForm() {
     const accountIdentifier: string = form['data-identifier'].value!;
     const password: string = form['data-password'].value!;
 
+    if (accountIdentifier.match("[A-Z]")) {
+      return alert('neither of username or email can contain uppercase letters');
+    }
+
     const promise = (async () => await session.login({
       accountIdentifier,
       password,

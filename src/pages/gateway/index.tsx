@@ -1,5 +1,7 @@
-import CaptchaProvider from '../../hooks/captcha/provider';
+import { useEffect } from 'react';
 import usePage from '../../hooks/page';
+import useSession from '../../hooks/session';
+import CaptchaProvider from '../../hooks/captcha/provider';
 
 import { PageId } from '..';
 
@@ -11,7 +13,10 @@ import { AppLink } from '../../components/app-link';
 
 
 export default function GatewayPage() {
+  const session = useSession();
   const { page, navigate } = usePage();
+
+  useEffect(() => session.uninitialize(), [session]);
 
   return (
     <main className={styles['main']}>
@@ -30,7 +35,7 @@ export default function GatewayPage() {
 
         <div>
           don't have an account?&nbsp;
-          <AppLink onClick={() => navigate(PageId.Signup)} href="/login">create one</AppLink>
+          <AppLink onClick={() => navigate(PageId.Signup)} href="/signup">create one</AppLink>
         </div>
         </> : null }
 
@@ -46,7 +51,7 @@ export default function GatewayPage() {
 
         <div>
           already have an account?&nbsp;
-          <AppLink onClick={() => navigate(PageId.Login)}>login</AppLink>
+          <AppLink onClick={() => navigate(PageId.Login)} href="/login">login</AppLink>
         </div>
         </> : null }
     </main>

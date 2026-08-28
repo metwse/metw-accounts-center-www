@@ -6,6 +6,7 @@ import AuthPage from './auth';
 import EmailVerificationSessionPage from './email-verification-session';
 import GatewayPage from './gateway';
 import SessionPage from './session';
+import DevelopersPage from './developers';
 
 
 export default function PageContent() {
@@ -24,6 +25,9 @@ export default function PageContent() {
 
     case PageId.Auth:
       return <AuthPage />;
+
+    case PageId.Developers:
+      return <DevelopersPage />;
 
     case PageId.NotFound:
       return (

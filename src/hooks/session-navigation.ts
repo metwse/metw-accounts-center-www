@@ -1,53 +1,59 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent, useSyncExternalStore } from 'react';
 import useSession from '../hooks/session';
 import usePage from '../hooks/page';
 
 import { PageId, performRedirect } from '../pages';
+import { AuthenticationState } from '../lib/metw';
 
 
 export default function useSessionNavigation() {
   const session = useSession();
-
   const { page, navigate } = usePage();
 
-  useEffect(() => {
-    const handleEmailVerificationLogin =
-      () => navigate(PageId.EmailVerificationSession);
+  const authenticationState = useSyncExternalStore(cb => {
+    session.addEventListener('authenticationState', cb);
 
-    const handleSessionLogin = () => navigate(PageId.Session);
+    return () => session.removeEventListener('authenticationState', cb);
+  }, () => session.authenticationState);
 
-    const handleLogout = () => navigate(PageId.Login);
+  const performNavigation = useEffectEvent(
+    (authenticationState: AuthenticationState) => {
+      switch (authenticationState) {
+        case AuthenticationState.Unauthenticated:
+          return navigate(PageId.Login);
 
-    session.addEventListener(
-      'login_emailverificationsession', handleEmailVerificationLogin
-    );
+        case AuthenticationState.Session:
+          if ((page.id === PageId.Loading || page.id === PageId.Login) &&
+              page.redirectUrl)
+            return performRedirect(page.redirectUrl);
 
-    session.addEventListener('login_session', handleSessionLogin);
+          if (page.id === PageId.Loading && page.redirectPage)
+            return navigate(page.redirectPage, false);
 
-    session.addEventListener('logout', handleLogout);
+          return navigate(PageId.Session, page.id !== PageId.Loading);
 
-    return () => {
-      session.removeEventListener(
-        'login_emailverificationsession', handleEmailVerificationLogin
-      );
-
-      session.removeEventListener('login_session', handleSessionLogin);
-
-      session.removeEventListener('logout', handleLogout);
-    };
-  }, [session, navigate]);
-
-  useEffect(() => {
-    if (page.id === PageId.Loading) {
-      session.loadTokenFromLocalStorage();
-
-      if (page.redirectUrl && session.sessionType === 'Session') {
-        try {
-          performRedirect(page.redirectUrl);
-        } catch (err) {
-          alert(err);
-        }
+        case AuthenticationState.EmailVerificationSession:
+          return navigate(
+            PageId.EmailVerificationSession,
+            page.id !== PageId.Loading
+        );
       }
     }
-  }, [page, session]);
+  );
+
+  const onLoadingPage = useEffectEvent(() => {
+    if (authenticationState === AuthenticationState.NotInitialized)
+      session.loadTokenFromLocalStorage();
+    else
+      performNavigation(authenticationState);
+  });
+
+  useEffect(() => {
+    if (page.id === PageId.Loading)
+      onLoadingPage();
+  }, [page, session, navigate]);
+
+  useEffect(() => {
+    performNavigation(authenticationState);
+  }, [authenticationState]);
 }

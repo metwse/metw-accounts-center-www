@@ -4,7 +4,7 @@ import type { Page, PageId } from '../../pages';
 
 type PageContextValue = {
   page: Page,
-  navigate: (destination: Page | PageId) => void
+  navigate: (destination: Page | PageId, pushState?: boolean) => void
 };
 
 export const PageContext =

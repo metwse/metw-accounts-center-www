@@ -2,6 +2,7 @@ export enum PageId {
   EmailVerificationSession, Session, /* not directly accesible */
   Login, Signup, /* /login and /signup endpoints */
   Auth, /* /auth */
+  Developers, /* /developers */
   NotFound,
   Loading, /* loading for account login */
 };
@@ -16,9 +17,17 @@ export type Page =
       readonly redirectUrl?: string,
     }
   | {
-      readonly id:
-        PageId.Login | PageId.Signup | PageId.EmailVerificationSession | PageId.Loading,
+      readonly id: PageId.Loading,
       readonly redirectUrl?: string
+      readonly redirectPage?: Page | PageId
+    }
+  | {
+      readonly id:
+        PageId.Login | PageId.Signup | PageId.EmailVerificationSession,
+      readonly redirectUrl?: string
+    }
+  | {
+      readonly id: PageId.Developers,
     }
   | {
       readonly id: PageId.NotFound,
@@ -44,18 +53,27 @@ export const pageWithRedirectUrl = [
 export const pageWithToken = [PageId.Auth];
 
 
-
 const endpointMap: Record<PageId, string> = {
   [PageId.Session]: '/', [PageId.EmailVerificationSession]: '/',
   [PageId.Login]: '/login', [PageId.Signup]: '/signup',
   [PageId.Auth]: '/auth',
+  [PageId.Developers]: '/developers',
   [PageId.NotFound]: '/404',
   [PageId.Loading]: '/',
+};
+
+const titleMap: Record<PageId, string | undefined> = {
+  [PageId.Session]: 'Your Account',
+  [PageId.EmailVerificationSession]: 'Pending Email Verification',
+  [PageId.Auth]: 'Authorize Acction',
+  [PageId.Developers]: 'Developers',
+  [PageId.NotFound]: '404!',
 };
 
 const endpointRevMap: Record<string, PageId> = {
   ['/login']: PageId.Login, ['/signup']: PageId.Signup,
   ['/auth']: PageId.Auth,
+  ['/developers']: PageId.Developers,
   ['/']: PageId.Loading,
 };
 
@@ -75,6 +93,12 @@ export function pageToLocation(page: Page): string {
     return path + '?' + searchParams.toString();
   else
     return path;
+}
+
+export function pageToTitle(page: Page): string {
+  const title = titleMap[page.id];
+
+  return title ? `${title} | Accounts Center` : 'Accounts Center';
 }
 
 export function pageFromLocation(): Page {
