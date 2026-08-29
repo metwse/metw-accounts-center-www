@@ -4,6 +4,7 @@ import usePage from '../../hooks/page';
 
 import { PageId } from '..';
 
+import AppDetailsPage from './app-details-page';
 import DevelopersHomepage from './homepage';
 
 import { AuthenticationState } from '../../lib/metw';
@@ -27,6 +28,6 @@ export default function DevelopersPage() {
       return <DevelopersHomepage />;
 
     case PageId.DevelopersApps:
-      return <main>under construction</main>;
+      return <AppDetailsPage />;
   }
 }

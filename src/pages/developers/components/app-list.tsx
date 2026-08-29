@@ -1,11 +1,11 @@
-import usePage from '../../hooks/page';
+import usePage from '../../../hooks/page';
 
-import { PageId } from '..';
+import { PageId } from '../..';
 
-import type { BasicAppInfoResponse } from '../../lib/metw-types';
+import type { BasicAppInfoResponse } from '../../../lib/metw-types';
 
-import styles from './style.module.scss';
-import { AppLink } from '../../components/app-link';
+import styles from '../style.module.scss';
+import { AppLink } from '../../../components/app-link';
 
 
 export default function AppList(
@@ -14,7 +14,7 @@ export default function AppList(
   const { navigate } = usePage();
 
   return (
-    <div className={styles['app-list']}>
+    <div className={styles['list']}>
       { apps ? (apps.length === 0 ? 'you do not have any registered applications' :
         <ul>
         { apps.map(

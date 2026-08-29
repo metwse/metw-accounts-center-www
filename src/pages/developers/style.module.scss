@@ -1,4 +1,4 @@
-.create-app {
+.form-wrapper {
   position: relative;
 
   form {
@@ -9,7 +9,7 @@
   }
 }
 
-.app-list {
+.list {
   overflow-wrap: break-word;
 
   ul {
@@ -30,8 +30,13 @@
   }
 }
 
+.buttons {
+  display: flex;
+  flex-wrap: wrap; gap: 0.25rem 0.5rem;
+}
+
 @media (max-width: 24rem) {
-  .create-app form {
+  .form-wrapper form {
     flex-direction: column;
   }
 }

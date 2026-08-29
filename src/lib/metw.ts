@@ -10,6 +10,7 @@ import type {
   DeleteEmailRequest,
   KdfResponse,
   LoginRequest,
+  NewClientSecretResponse,
   RetrySignUpRequest,
   SetPrimaryEmailRequest,
   SignUpRequest,
@@ -435,5 +436,45 @@ export class Session extends EventTarget {
         query: { captcha }
       }
     );
+  }
+
+  /* APP MANAGEMENT */
+  async appRollClientSecret(appId: string): Promise<ApiResult<NewClientSecretResponse>> {
+    return await this.#request(
+      `/me/apps/${appId}/roll-client-secret`,
+      { method: 'POST' }
+    );
+  }
+
+  async renameApp(appId: string, newName: string): Promise<ApiActionResult> {
+    return await this.#request(
+      `/me/apps/${appId}/name`,
+      { method: 'PATCH', body: { name: newName } }
+    );
+  }
+
+  async deleteApp(appId: string): Promise<ApiActionResult> {
+    return await this.#request(
+      `/me/apps/${appId}`,
+      { method: 'DELETE' }
+    );
+  }
+
+  async appAddRedirectUrl(appId: string, redirectUrl: string): Promise<ApiActionResult> {
+    return await this.#request(
+      `/me/apps/${appId}/redirect-urls`,
+      { method: 'POST', body: { redirect_url: redirectUrl } }
+    );
+  }
+
+  async appRemoveRedirectUrl(appId: string, redirectUrl: string): Promise<ApiActionResult> {
+    return await this.#request(
+      `/me/apps/${appId}/redirect-urls`,
+      { method: 'DELETE', body: { redirect_url: redirectUrl } }
+    );
+  }
+
+  async appGetRedirectUrls(appId: string): Promise<ApiResult<string[]>> {
+    return await this.#request(`/me/apps/${appId}/redirect-urls`);
   }
 }

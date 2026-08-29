@@ -9,8 +9,8 @@ import { type BasicAppInfoResponse } from '../../lib/metw-types';
 
 import CaptchaProvider from '../../hooks/captcha/provider';
 
-import CreateAppForm from './create-app-form';
-import AppList from './app-list';
+import CreateAppForm from './components/create-app-form';
+import AppList from './components/app-list';
 
 import styles from './style.module.scss';
 import { AppLink } from '../../components/app-link';
@@ -33,14 +33,14 @@ export default function DevelopersHomepage() {
 
     let ignore = false;
 
-    async function fetchMe() {
+    async function fetchApps() {
       const res = await session.apps();
 
       if (res.ok && !ignore)
         setApps(res.data);
     }
 
-    fetchMe();
+    fetchApps();
 
     return () => { ignore = true; };
   }, [session]);
@@ -53,7 +53,7 @@ export default function DevelopersHomepage() {
         <AppList apps={apps} />
       </section>
 
-      <section className={styles['create-app']}>
+      <section className={styles['form-wrapper']}>
         <h3>Create a new application</h3>
 
         <CaptchaProvider>

@@ -81,6 +81,10 @@ export type AppInfoResponse = {
   readonly name: string,
 }
 
+export type NewClientSecretResponse = {
+  readonly client_secret: string,
+}
+
 export type KdfResponse =
   {
     readonly client_password_kdf:
