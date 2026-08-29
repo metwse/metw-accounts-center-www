@@ -71,12 +71,12 @@ export type AccountResponse = {
 }
 
 export type BasicAppInfoResponse = {
-  readonly app_id: string,
+  readonly application_id: string,
   readonly name: string,
 }
 
 export type AppInfoResponse = {
-  readonly app_id: string,
+  readonly application_id: string,
   readonly client_secret: string,
   readonly name: string,
 }

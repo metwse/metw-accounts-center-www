@@ -31,7 +31,7 @@ export default function CreateAppForm(
     if (!res.ok) {
       alert(res.error.message);
     } else {
-      pushApp({ app_id: res.data.app_id, name });
+      pushApp({ application_id: res.data.application_id, name });
 
       setNewApp({
         clientSecret: res.data.client_secret,

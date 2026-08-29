@@ -103,7 +103,7 @@ export function pageToLocation(page: Page): string {
     searchParams.set('auth', page.token);
 
   if (supportsAppId(page) && page.appId)
-    searchParams.set('app_id', page.appId);
+    searchParams.set('application_id', page.appId);
 
   const path: string = endpointMap[page.id];
   const searchParamsString = searchParams.toString();
@@ -133,7 +133,7 @@ export function pageFromLocation(): Page {
   if (pageWithToken.includes(id))
     token = searchParams.get('auth') || undefined;
   if (pageWithAppId.includes(id))
-    appId = searchParams.get('app_id') || undefined;
+    appId = searchParams.get('application_id') || undefined;
 
   return { id, token, redirectUrl, appId };
 }

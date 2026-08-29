@@ -22,10 +22,10 @@ export default function AppList(
               return (
                 <li key={i}>
                   <span>{app.name}</span>
-                  <i>(application ID: {app.app_id})</i>
+                  <i>(application ID: {app.application_id})</i>
                   <AppLink
-                    onClick={() => navigate({ id: PageId.DevelopersApps, appId: app.app_id })}
-                    href={`/developers/apps?app_id=${app.app_id}`}
+                    onClick={() => navigate({ id: PageId.DevelopersApps, appId: app.application_id })}
+                    href={`/developers/apps?application_id=${app.application_id}`}
                     >details</AppLink>
                 </li>
               );

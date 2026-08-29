@@ -309,7 +309,7 @@ export class Session extends EventTarget {
     const scopeName = scope[0][0];
 
     const res = await this.#request(
-      '/auth',
+      '/token-actions',
       {
         method: 'POST',
         body: { token }
@@ -422,14 +422,14 @@ export class Session extends EventTarget {
   }
 
   async apps(): Promise<ApiResult<BasicAppInfoResponse[]>> {
-    return await this.#request('/me/apps', {});
+    return await this.#request('/me/applications', {});
   }
 
   async createApp(
     { name, captcha }: CreateAppRequest
   ): Promise<ApiResult<AppInfoResponse>> {
     return await this.#request(
-      '/me/apps',
+      '/me/applications',
       {
         method: 'POST',
         body: { name },
@@ -441,40 +441,40 @@ export class Session extends EventTarget {
   /* APP MANAGEMENT */
   async appRollClientSecret(appId: string): Promise<ApiResult<NewClientSecretResponse>> {
     return await this.#request(
-      `/me/apps/${appId}/roll-client-secret`,
+      `/me/applications/${appId}/rotate-client-secret`,
       { method: 'POST' }
     );
   }
 
   async renameApp(appId: string, newName: string): Promise<ApiActionResult> {
     return await this.#request(
-      `/me/apps/${appId}/name`,
+      `/me/applications/${appId}/name`,
       { method: 'PATCH', body: { name: newName } }
     );
   }
 
   async deleteApp(appId: string): Promise<ApiActionResult> {
     return await this.#request(
-      `/me/apps/${appId}`,
+      `/me/applications/${appId}`,
       { method: 'DELETE' }
     );
   }
 
   async appAddRedirectUrl(appId: string, redirectUrl: string): Promise<ApiActionResult> {
     return await this.#request(
-      `/me/apps/${appId}/redirect-urls`,
+      `/me/applications/${appId}/redirect-urls`,
       { method: 'POST', body: { redirect_url: redirectUrl } }
     );
   }
 
   async appRemoveRedirectUrl(appId: string, redirectUrl: string): Promise<ApiActionResult> {
     return await this.#request(
-      `/me/apps/${appId}/redirect-urls`,
+      `/me/applications/${appId}/redirect-urls`,
       { method: 'DELETE', body: { redirect_url: redirectUrl } }
     );
   }
 
   async appGetRedirectUrls(appId: string): Promise<ApiResult<string[]>> {
-    return await this.#request(`/me/apps/${appId}/redirect-urls`);
+    return await this.#request(`/me/applications/${appId}/redirect-urls`);
   }
 }
