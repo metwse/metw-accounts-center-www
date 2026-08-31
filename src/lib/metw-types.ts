@@ -113,5 +113,5 @@ export type ApplicationConsentStatusResponse = {
 }
 
 export type CreateAuthorizationcodeResponse = {
-  readonly authorization_code: boolean,
+  readonly authorization_code: string,
 }

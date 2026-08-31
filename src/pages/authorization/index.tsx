@@ -33,6 +33,8 @@ export default function AuthorizationPage() {
     let ignore = false;
 
     async function fetchConsentStatus() {
+      setConsentStatus(null);
+
       if (page.id !== PageId.Authorize ||
           session.authenticationState !== AuthenticationState.Session)
         return;
