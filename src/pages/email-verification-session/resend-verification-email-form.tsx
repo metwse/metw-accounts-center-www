@@ -24,11 +24,17 @@ export default function ResendVerificationEmailForm() {
     const email: string = form['data-email'].value!;
 
     let redirectUrl: string | undefined;
-    if (page.id === PageId.EmailVerificationSession /* type assertion */)
+    let applicationId: string | undefined;
+    if (page.id === PageId.EmailVerificationSession /* type assertion */) {
       redirectUrl = page.redirectUrl;
+      applicationId = page.applicationId;
+    }
 
     const promise = (async () =>
-      await session.retrySignup({ email, captcha, redirectUrl })
+      await session.retrySignup({
+        email, captcha,
+        application: redirectUrl && applicationId ? { redirectUrl, applicationId } : undefined
+      })
     )();
 
     const res = await loading(() => promise);

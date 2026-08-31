@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useSyncExternalStore } from 'react';
 import useSession from '../hooks/session';
 import usePage from '../hooks/page';
 
-import { PageId, performRedirect } from '../pages';
+import { PageId } from '../pages';
 import { AuthenticationState } from '../lib/metw';
 
 
@@ -24,8 +24,8 @@ export default function useSessionNavigation() {
 
         case AuthenticationState.Session:
           if ((page.id === PageId.Loading || page.id === PageId.Login) &&
-              page.redirectUrl)
-            return performRedirect(page.redirectUrl);
+              page.redirectUrl && page.applicationId)
+            return navigate(PageId.Authorize);
 
           if (page.id === PageId.Loading && page.redirectPage)
             return navigate(page.redirectPage, false);

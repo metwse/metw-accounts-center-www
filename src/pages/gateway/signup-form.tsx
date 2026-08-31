@@ -41,12 +41,16 @@ export default function SignupForm() {
     const captcha = await executeCaptcha();
 
     let redirectUrl: string | undefined;
-    if (page.id === PageId.Signup /* type assertion */)
+    let applicationId: string | undefined;
+    if (page.id === PageId.Signup /* type assertion */) {
       redirectUrl = page.redirectUrl;
+      applicationId = page.applicationId;
+    }
 
     const promise = (async () =>
       await session.signup({
-        username, email, password, captcha, redirectUrl
+        username, email, password, captcha,
+        application: redirectUrl && applicationId ? { redirectUrl, applicationId } : undefined
       })
     )();
 

@@ -4,7 +4,7 @@ import { PageContext } from '.';
 import {
   pageFromLocation, pageToLocation, PageId,
   pageWithRedirectUrl, type Page,
-  supportsRedirect,
+  supportsRedirectApplication,
   pageToTitle
 } from '../../pages';
 
@@ -14,11 +14,16 @@ function resolveDestination(currentPage: Page, destination: Page | PageId): Page
     destination : { id: destination };
 
   if (
-    supportsRedirect(currentPage) &&
+    supportsRedirectApplication(currentPage) &&
     pageWithRedirectUrl.includes(nextPage.id) &&
-    currentPage.redirectUrl
+    currentPage.redirectUrl &&
+    currentPage.applicationId
   ) {
-    return { ...nextPage, redirectUrl: currentPage.redirectUrl } as Page;
+    return {
+      ...nextPage,
+      redirectUrl: currentPage.redirectUrl,
+      applicationId: currentPage.applicationId
+    } as Page;
   }
 
   return nextPage;

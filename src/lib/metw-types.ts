@@ -16,7 +16,7 @@ export type SignUpRequest = {
   readonly username: string,
   readonly email: string,
   readonly password: string,
-  readonly redirectUrl?: string,
+  readonly application?: RedirectApplication,
 
   readonly captcha: string
 };
@@ -28,10 +28,15 @@ export type LoginRequest = {
 
 export type RetrySignUpRequest = {
   readonly email: string,
-  readonly redirectUrl?: string,
+  readonly application?: RedirectApplication,
 
   readonly captcha: string
 };
+
+export type RedirectApplication = {
+  readonly redirectUrl: string,
+  readonly applicationId: string,
+}
 
 
 export type AddEmailRequest = {
@@ -70,17 +75,6 @@ export type AccountResponse = {
   readonly username_aliasses: string[],
 }
 
-export type BasicAppInfoResponse = {
-  readonly application_id: string,
-  readonly name: string,
-}
-
-export type AppInfoResponse = {
-  readonly application_id: string,
-  readonly client_secret: string,
-  readonly name: string,
-}
-
 export type NewClientSecretResponse = {
   readonly client_secret: string,
 }
@@ -102,3 +96,22 @@ export type KdfResponse =
       }
   };
 
+export type BasicAppInfoResponse = {
+  readonly application_id: string,
+  readonly name: string,
+}
+
+export type AppInfoResponse = {
+  readonly application_id: string,
+  readonly client_secret: string,
+  readonly name: string,
+}
+
+export type ApplicationConsentStatusResponse = {
+  readonly name: string,
+  readonly is_authorized: boolean,
+}
+
+export type CreateAuthorizationcodeResponse = {
+  readonly authorization_code: boolean,
+}

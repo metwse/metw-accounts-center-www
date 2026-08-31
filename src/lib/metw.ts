@@ -4,9 +4,11 @@ import type {
   AddEmailRequest,
   ApiActionResult, ApiResult,
   AppInfoResponse,
+  ApplicationConsentStatusResponse,
   AuthRequest,
   BasicAppInfoResponse,
   CreateAppRequest,
+  CreateAuthorizationcodeResponse,
   DeleteEmailRequest,
   KdfResponse,
   LoginRequest,
@@ -197,7 +199,7 @@ export class Session extends EventTarget {
 
   /* AUTHENTICATION */
   async signup(
-    { username, email, password, redirectUrl, captcha }: SignUpRequest
+    { username, email, password, application, captcha }: SignUpRequest
   ): Promise<ApiResult<TokenResponse>> {
     const passwordHash = await base64EncodedPbkdf2Sha256(password, PBKDF2_PARAMETERS);
 
@@ -214,7 +216,10 @@ export class Session extends EventTarget {
             pbkdf2_iterations: PBKDF2_PARAMETERS.iterations,
             pbkdf2_length: PBKDF2_PARAMETERS.length
           },
-          redirect_url: redirectUrl
+          application: application ? {
+            application_id: application?.applicationId,
+            redirect_url: application?.redirectUrl,
+          } : null,
         },
         query: { captcha }
       }
@@ -291,19 +296,25 @@ export class Session extends EventTarget {
 
   /* EMAIL VERIFICATION SESSION */
   async retrySignup(
-    { email, captcha, redirectUrl }: RetrySignUpRequest
+    { email, captcha, application }: RetrySignUpRequest
   ): Promise<ApiActionResult> {
     return await this.#request(
       '/signup/retry',
       {
         method: 'POST',
-        body: { email, redirect_url: redirectUrl },
+        body: {
+          email,
+          application: application ? {
+            application_id: application?.applicationId,
+            redirect_url: application?.redirectUrl,
+          } : null,
+        },
         query: { captcha }
       }
     );
   }
 
-  /* AUTHORIZATION */
+  /* AUTHORIZATION (TOKEN) */
   async auth({ token }: AuthRequest): Promise<ApiResult<string>> {
     const scope = Object.entries(decodeToken(token)!.scope);
     const scopeName = scope[0][0];
@@ -476,5 +487,25 @@ export class Session extends EventTarget {
 
   async appGetRedirectUrls(appId: string): Promise<ApiResult<string[]>> {
     return await this.#request(`/me/applications/${appId}/redirect-urls`);
+  }
+
+  /* AUTHORIZATION (APPLICATION) */
+  async authorizationStatus(appId: string): Promise<ApiResult<ApplicationConsentStatusResponse>> {
+    return await this.#request(`/me/application-consents/${appId}`);
+  }
+
+  async authorizeApplication(appId: string): Promise<ApiActionResult> {
+    return await this.#request(
+      `/me/application-consents/${appId}`,
+      { method: 'PUT' }
+    );
+  }
+
+  async createAuthorizatoinCode(appId: string, redirectUrl: string):
+      Promise<ApiResult<CreateAuthorizationcodeResponse>> {
+    return await this.#request(
+      `/me/application-consents/${appId}/authorization-code`,
+      { method: 'POST', body: { redirect_url: redirectUrl } }
+    );
   }
 }
