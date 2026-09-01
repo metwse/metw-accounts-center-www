@@ -91,7 +91,10 @@ export default function AuthorizationPage() {
     if (!res.ok) {
       alert(res.error.message);
     } else {
-      window.location.replace(`${page.redirectUrl}${res.data.authorization_code}`);
+      const redirectUrl = new URL(page.redirectUrl!);
+      redirectUrl.searchParams.set('authorization_code', res.data.authorization_code);
+
+      window.location.replace(redirectUrl);
     }
   };
 
